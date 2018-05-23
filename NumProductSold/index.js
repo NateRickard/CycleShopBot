@@ -4,10 +4,10 @@ module.exports = function (context, req) {
     context.log('JavaScript HTTP trigger function processed a request.');
 
     var client = hdb.createClient({
-        host     : '10.161.8.5',
-        port     : 31041 , 
-        user     : 'Xamarin',
-        password : 'Microsoft1234'
+        host     : process.env["HanaHostIP"], //'10.161.8.5',
+        port     : process.env["HanaPort"], //31041 ,
+        user     : process.env["HanaUser"], //'Xamarin',
+        password : process.env["HanaPassword"], //'Microsoft1234'
     });
 
     client.on('error', function (err) {
@@ -27,7 +27,7 @@ module.exports = function (context, req) {
         var d = new Date();
         var curMonth = d.getMonth() + 1;
         var dateclause = 'AND "DEMODB"."DimDate"."MonthNumberOfYear" = ' + curMonth + ' '
-        
+
         if (req.query.quarter)
             dateclause = 'AND "DEMODB"."DimDate"."CalendarQuarter" = ' + req.query.quarter + ' '
         if (req.query.month)
@@ -35,7 +35,7 @@ module.exports = function (context, req) {
 
         var query = `SELECT "DEMODB"."DimSalesTerritory"."SalesTerritoryCountry" AS country,
                         SUM("DEMODB"."FactInternetSalesPartition"."OrderQuantity")AS totalqty
-                    FROM "DEMODB"."FactInternetSalesPartition" 
+                    FROM "DEMODB"."FactInternetSalesPartition"
                     INNER JOIN  "DEMODB"."DimProduct"
 	                    ON "DEMODB"."FactInternetSalesPartition"."ProductKey" = "DEMODB"."DimProduct"."ProductKey"
                     INNER JOIN "DEMODB"."DimSalesTerritory"
@@ -70,4 +70,3 @@ module.exports = function (context, req) {
         });
     });
 };
-
