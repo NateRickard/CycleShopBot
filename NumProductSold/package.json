@@ -1,0 +1,14 @@
+{
+  "name": "NumProductSold",
+  "version": "1.0.0",
+  "description": "Returns number of products sold for part passed in query string 'product=xxxx'",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Steve Hall",
+  "license": "MIT",
+  "dependencies": {
+    "hdb": "^0.15.0"
+  }
+}

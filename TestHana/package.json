@@ -1,0 +1,14 @@
+{
+  "name": "Hana Test",
+  "version": "1.0.0",
+  "description": "Test Hana connectivity",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Steve Hall",
+  "license": "MIT",
+  "dependencies": {
+    "hdb": "^0.15.0"
+  }
+}
