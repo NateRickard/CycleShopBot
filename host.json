@@ -1,8 +1,1 @@
-{
-   "Values": {
-      "HanaHostIP" : "10.161.8.5",
-      "HanaPort" : 31041,
-      "HanaUser" : "Xamarin",
-      "HanaPassword" : "Microsoft1234"
-   }
- }
+{ }

@@ -4,10 +4,10 @@ module.exports = function (context, req) {
     context.log('JavaScript HTTP trigger function processed a request.');
 
     var client = hdb.createClient({
-        host     : process.env["HanaHostIP"], //'10.161.8.5',
-        port     : process.env["HanaPort"], //31041 ,
-        user     : process.env["HanaUser"], //'Xamarin',
-        password : process.env["HanaPassword"], //'Microsoft1234'
+        host     : '10.161.8.5',
+        port     : 31041 ,
+        user     : 'Xamarin',
+        password : 'Microsoft1234'
     });
 
     client.on('error', function (err) {
