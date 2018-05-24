@@ -1,5 +1,6 @@
-﻿using System;
-using System.Globalization;
+﻿#load "Utils.csx"
+
+using System;
 
 using Microsoft.Bot.Builder.Azure;
 using Microsoft.Bot.Builder.Dialogs;
@@ -28,9 +29,12 @@ public class MonthSelectionDialog : IDialog<int>
 
 		var monthOptions = new List<string> ();
 
-		for (var i = dateRangeMin.Month; i <= dateRangeMax.Month; i++)
+		DateTime dtNext = dateRangeMin;
+
+		while (dtNext < dateRangeMax)
 		{
-			monthOptions.Add (getMonthName (i));
+			monthOptions.Add (Utils.GetMonthName (dtNext.Month));
+			dtNext = dtNext.AddMonths (1);
 		}
 
 		PromptDialog.Choice<string> (
@@ -47,20 +51,10 @@ public class MonthSelectionDialog : IDialog<int>
 	private async Task AfterMenuSelection (IDialogContext context, IAwaitable<string> result)
 	{
 		var monthName = await result;
-		var selectedMonth = getMonthNumber(monthName);
+		var selectedMonth = Utils.GetMonthNumber (monthName);
 
 		await context.PostAsync ($"Great, I'll show you results for {monthName}");
 
 		context.Done (selectedMonth);
-	}
-
-	private string getMonthName (int month)
-	{
-		return CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName (month);
-	}
-
-	private int getMonthNumber (string monthName)
-	{
-		return Convert.ToDateTime ("01-" + monthName + "-2018").Month;
 	}
 }

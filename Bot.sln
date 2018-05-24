@@ -27,12 +27,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "messages", "messages", "{F4
 	ProjectSection(SolutionItems) = preProject
 		messages\BasicLuisDialog.csx = messages\BasicLuisDialog.csx
 		messages\CustomerSales.csx = messages\CustomerSales.csx
+		messages\CustomerSalesDataDialog.csx = messages\CustomerSalesDataDialog.csx
 		messages\DecimalConverter.csx = messages\DecimalConverter.csx
 		messages\function.json = messages\function.json
 		messages\MonthSelectionDialog.csx = messages\MonthSelectionDialog.csx
+		messages\ProductSelectionDialog.csx = messages\ProductSelectionDialog.csx
 		messages\project.json = messages\project.json
 		messages\project.lock.json = messages\project.lock.json
 		messages\run.csx = messages\run.csx
+		messages\Utils.csx = messages\Utils.csx
 	EndProjectSection
 EndProject
 Global
