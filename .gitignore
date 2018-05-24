@@ -6,6 +6,9 @@
 *.user
 *.sln.docstates
 *.userprefs
+project.lock.json
+local.settings.json
+.vs/
 
 # Xamarin.Android
 Resource.designer.cs
@@ -94,7 +97,6 @@ _ReSharper*/
 
 # TeamCity is a build add-in
 _TeamCity*
-
 
 # NCrunch
 *.ncrunch*
@@ -214,5 +216,3 @@ Thumbs.db
 
 #bitrise
 .bitrise*
-messages/project.lock.json
-local.settings.json
