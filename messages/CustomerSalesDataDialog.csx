@@ -109,9 +109,11 @@ public class CustomerSalesDataDialog : IDialog<IMessageActivity>
 				var productSynonyms = (values as List<object>).Where (v => v is string).Select (v => v as string).ToList ();
 
 				// if we have an exact match, this is the entity we want
-				if (productSynonyms.Count == 1 && productSynonyms [0].ToLower () == entity.Entity.ToLower ())
+				if (productSynonyms.Count == 1 && entity.Entity.ToLower ().Contains(productSynonyms [0].ToLower ())) //TODO: do we need this 2nd condition??
 				{
-					product = entity.Entity;
+					// in this case, the actual product name should be passed in as the synonym or they should be equal
+					//	e.g. "Touring Tires" will return "Touring Tire" as the synonym, when using "Touring Tire" they will be equal
+					product = productSynonyms [0];
 					break;
 				}
 				else
