@@ -108,19 +108,15 @@ public class BasicLuisDialog : LuisDialog<object>
 			{
 				var numberEntity = numberEntities [0];
 
-				//if (result.TryFindEntity (Number, out EntityRecommendation numberEntity))
-				//{
-					// sneaky phony numbers coming back when entering dates like 1/1/2018, so we axe them here
-					if (numberEntity.StartIndex >= dateStartIndex && numberEntity.EndIndex <= dateEndIndex)
-					{
-						numberEntities.Remove (numberEntity);
-						continue;
-					}
+				// sneaky phony numbers coming back when entering dates like 1/1/2018, so we axe them here
+				if (numberEntity.StartIndex >= dateStartIndex && numberEntity.EndIndex <= dateEndIndex)
+				{
+					numberEntities.Remove (numberEntity);
+					continue;
+				}
 
-					numberCustomers = Convert.ToInt32 (numberEntity.Entity);
-					break;
-				//}
-				//else break;
+				numberCustomers = Convert.ToInt32 (numberEntity.Entity);
+				break;
 			}
 
 			// if the date range seems to be more than a 1 month span we need to ket the user know that's not supported
@@ -153,7 +149,6 @@ public class BasicLuisDialog : LuisDialog<object>
 		// create our reply and add the sales card attachment
 		var replyMessage = context.MakeMessage ();
 		var card = getSalesCard (numberCustomers, selectedMonth, data);
-
 
 		// Create the attachment
 		replyMessage.Attachments = new List<Attachment> {
@@ -224,8 +219,8 @@ public class BasicLuisDialog : LuisDialog<object>
 			facts.Add (new AdaptiveFact (customerSalesData.Customer, String.Format ("{0:C}", customerSalesData.TotalSales)));
 		}
 
-		var monthPrior = month - 1;
-		var monthAfter = month + 1;
+		var monthPrior = month == 1 ? 12 : month - 1;
+		var monthAfter = month == 12 ? 1 : month + 1;
 
 		AdaptiveCard card = new AdaptiveCard ()
 		{
