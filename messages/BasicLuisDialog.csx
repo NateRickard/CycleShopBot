@@ -96,7 +96,10 @@ public class BasicLuisDialog : LuisDialog<object>
 	public async Task ProductsIntent (IDialogContext context, LuisResult result)
 	{
 		await context.PostAsync ($"Here are some of the great products we sell.");
-		await context.PostAsync ($"Vest\nGloves\n\nTire\n\nWater Bottle\n\nSocks\n\nRoad Tire\n\nMountain Tire\n\nShorts\n\nTouring Tire\n\nJersey");
+		var replyMessage = context.MakeMessage ();
+		replyMessage.TextFormat = "markdown";
+		replyMessage.Text = $"Vest\nGloves\n\nTire\n\nWater Bottle\n\nSocks\n\nRoad Tire\n\nMountain Tire\n\nShorts\n\nTouring Tire\n\nJersey";
+		await context.PostAsync(replyMessage);
 		context.Wait (MessageReceived);
 	}
 
