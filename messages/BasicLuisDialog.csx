@@ -92,6 +92,14 @@ public class BasicLuisDialog : LuisDialog<object>
 		context.Wait (MessageReceived);
 	}
 
+	[LuisIntent ("Products")]
+	public async Task ProductsIntent (IDialogContext context, LuisResult result)
+	{
+		await context.PostAsync ($"Here are some of the great products we sell.");
+		await context.PostAsync ($"Vest\nGloves\nTire\nWater Bottle\nSocks\nRoad Tire\nMountain Tire\nShorts\nTouring Tire\nJersey\n");
+		context.Wait (MessageReceived);
+	}
+
 	[LuisIntent ("TopCustomersForProduct")]
 	public async Task TopCustomersForProductIntent (IDialogContext context, LuisResult result)
 	{
@@ -251,11 +259,11 @@ public class BasicLuisDialog : LuisDialog<object>
 		{
 			string functionSecret = ConfigurationManager.AppSettings ["TopCustomersForProductAPIKey"];
 
-			// anotherFunctionUri is another Azure Function's 
-			// public URL, which should provide the secret code stored in app settings 
+			// anotherFunctionUri is another Azure Function's
+			// public URL, which should provide the secret code stored in app settings
 			// with key 'AnotherFunction_secret'
 			//Uri anotherFunctionUri = new Uri(req.RequestUri.AbsoluteUri.Replace(
-			//	req.RequestUri.PathAndQuery, 
+			//	req.RequestUri.PathAndQuery,
 			//	$"/api/AnotherFunction?code={anotherFunctionSecret}"));
 
 			var functionUri = $"https://sapbotdemo-2018.sapbotase.p.azurewebsites.net/api/TopCustomersForProduct?code={functionSecret}";
