@@ -38,6 +38,30 @@ public class BasicLuisDialog : LuisDialog<object>
 	{
 	}
 
+	protected override async Task MessageReceived (IDialogContext context, IAwaitable<IMessageActivity> item)
+	{
+		var message = await item;
+
+		if (message.Value != null)
+		{
+			// Got an Action Submit!
+			dynamic value = message.Value;
+			string submitType = value.Type.ToString ();
+
+			switch (submitType)
+			{
+				case "MonthChange":
+					int selectedMonth = Convert.ToInt32 (value.Month);
+					await ShowCustomerSalesTotals (context, new AwaitableFromItem<int> (selectedMonth));
+					return;
+			}
+		}
+		else
+		{
+			await base.MessageReceived (context, item);
+		}
+	}
+
 	[LuisIntent ("None")]
 	public async Task NoneIntent (IDialogContext context, LuisResult result)
 	{
@@ -141,14 +165,21 @@ public class BasicLuisDialog : LuisDialog<object>
 
 		// show a typing indicator to let the user know we're working on it?
 
+		
+
+		await ShowCustomerSalesTotalsCard (context, selectedMonth);
+	}
+
+	private async Task ShowCustomerSalesTotalsCard (IDialogContext context, int selectedMonth)
+	{
 		// get SAP data with parameterized query and return it
 		var data = await GetTopCustomerSalesForProduct (product, selectedMonth, numberCustomers);
 
-		await context.PostAsync ($"It looks like these are the top {numberCustomers} customers that have purchased {product} in the month of {getMonthName(selectedMonth)}:");
+		await context.PostAsync ($"It looks like these are the top {numberCustomers} customers that have purchased {product} in the month of {getMonthName (selectedMonth)}:");
 
 		// create our reply and add the sales card attachment
 		var replyMessage = context.MakeMessage ();
-		var card = getSalesCard (numberCustomers, selectedMonth, data);
+		var card = getSalesCard (product, numberCustomers, selectedMonth, data);
 
 		// Create the attachment
 		replyMessage.Attachments = new List<Attachment> {
@@ -210,7 +241,7 @@ public class BasicLuisDialog : LuisDialog<object>
 		}
 	}
 
-	private AdaptiveCard getSalesCard (int numberCustomers, int month, List<CustomerSales> salesData)
+	private AdaptiveCard getSalesCard (string product, int numberCustomers, int month, List<CustomerSales> salesData)
 	{
 		var facts = new List<AdaptiveFact> ();
 
@@ -232,7 +263,7 @@ public class BasicLuisDialog : LuisDialog<object>
 					{
 						new AdaptiveTextBlock()
 						{
-							Text = "Sales Results",
+							Text = $"Sales Results - {toTitleCase(product)}",
 							Size = AdaptiveTextSize.ExtraLarge,
 							Weight = AdaptiveTextWeight.Bolder
 						},
@@ -243,23 +274,27 @@ public class BasicLuisDialog : LuisDialog<object>
 						new AdaptiveFactSet()
 						{
 							Facts = facts
-						},
-						new AdaptiveChoiceSetInput()
-						{
-							Id = "month",
-							Style = AdaptiveChoiceInputStyle.Compact,
-							Choices = new List<AdaptiveChoice>()
-							{
-								new AdaptiveChoice() { Title = $"{getMonthName(monthPrior)}", Value = $"{monthPrior}" },
-								new AdaptiveChoice() { Title = $"{getMonthName(month)}", Value = $"{month}" },
-								new AdaptiveChoice() { Title = $"{getMonthName(monthAfter)}", Value = $"{monthAfter}" }
-							},
-							Value = $"{month}"
 						}
 					}
 				}
 			}
 		};
+
+		card.Actions.Add (
+			new AdaptiveSubmitAction ()
+			{
+				Title = getMonthName (monthPrior),
+				DataJson = $"{{ \"Type\": \"MonthChange\", \"Month\": {monthPrior} }}"
+			}
+		);
+
+		card.Actions.Add (
+			new AdaptiveSubmitAction ()
+			{
+				Title = getMonthName (monthAfter),
+				DataJson = $"{{ \"Type\": \"MonthChange\", \"Month\": {monthAfter} }}"
+			}
+		);
 
 		return card;
 	}
@@ -267,5 +302,12 @@ public class BasicLuisDialog : LuisDialog<object>
 	private string getMonthName (int month)
 	{
 		return CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName (month);
+	}
+
+	private string toTitleCase (string str)
+	{
+		TextInfo textInfo = new CultureInfo ("en-US", false).TextInfo;
+
+		return textInfo.ToTitleCase (str);
 	}
 }
