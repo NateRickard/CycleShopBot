@@ -5,7 +5,7 @@ module.exports = function (context, req) {
 
     var client = hdb.createClient({
         host     : '10.161.8.5',
-        port     : 31041 , 
+        port     : 31041 ,
         user     : 'Xamarin',
         password : 'Microsoft1234'
     });
@@ -28,7 +28,7 @@ module.exports = function (context, req) {
         var d = new Date();
         var curMonth = d.getMonth() + 1;
         var dateclause = 'AND "DEMODB"."DimDate"."MonthNumberOfYear" = ' + curMonth + ' '
-        
+
         if (req.query.quarter)
             dateclause = 'AND "DEMODB"."DimDate"."CalendarQuarter" = ' + req.query.quarter + ' '
         if (req.query.month)
@@ -36,9 +36,9 @@ module.exports = function (context, req) {
         if (req.query.count)
             numtoreturn = req.query.count
 
-        var query = `SELECT TOP ` + numtoreturn + ` "DEMODB"."LargeDimCustomer"."LastName" AS Customer, 
+        var query = `SELECT TOP ` + numtoreturn + ` "DEMODB"."LargeDimCustomer"."LastName" AS Customer,
                         SUM("DEMODB"."FactInternetSalesPartition"."SalesAmount") AS TotalSales
-                    FROM "DEMODB"."FactInternetSalesPartition" 
+                    FROM "DEMODB"."FactInternetSalesPartition"
                     INNER JOIN  "DEMODB"."LargeDimCustomer"
 	                    ON "DEMODB"."FactInternetSalesPartition"."CustomerKey" = "DEMODB"."LargeDimCustomer"."CustomerKey"
                     INNER JOIN "DEMODB"."DimProduct"
@@ -47,7 +47,7 @@ module.exports = function (context, req) {
 	                    ON "DEMODB"."DimDate"."DateKey" = "DEMODB"."FactInternetSalesPartition"."OrderDateKey"
                     WHERE UCase("DEMODB"."DimProduct"."EnglishProductName") LIKE UCase('%` + req.query.product + `%')` +
 	                `   AND "DEMODB"."DimDate"."CalendarYear" = 2013 ` + dateclause +
-                    `GROUP BY "DEMODB"."LargeDimCustomer"."LastName" 
+                    `GROUP BY "DEMODB"."LargeDimCustomer"."LastName"
                     ORDER BY SUM("DEMODB"."FactInternetSalesPartition"."SalesAmount") DESC`
 
         client.exec(query, function(err, rows) {
@@ -73,4 +73,3 @@ module.exports = function (context, req) {
         });
     });
 };
-
