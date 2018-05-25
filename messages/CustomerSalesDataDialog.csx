@@ -50,6 +50,8 @@ public class CustomerSalesDataDialog : IDialog<IMessageActivity>
 		if (products.SelectedProduct != null)
 		{
 			await context.PostAsync ($"Sure, I can help you with sales data for {Utils.ToTitleCase (products.SelectedProduct)}");
+
+			//Send typing indicator
 			var typingIndicator = context.MakeMessage();
 			typingIndicator.Type = ActivityTypes.Typing;
 			await context.PostAsync(typingIndicator);
