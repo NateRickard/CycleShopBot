@@ -50,6 +50,9 @@ public class CustomerSalesDataDialog : IDialog<IMessageActivity>
 		if (products.SelectedProduct != null)
 		{
 			await context.PostAsync ($"Sure, I can help you with sales data for {Utils.ToTitleCase (products.SelectedProduct)}");
+			var typingIndicator = context.MakeMessage();
+			typingIndicator.Type = ActivityTypes.Typing;
+			await context.PostAsync(typingIndicator);
 
 			await ProductSelected (context, new AwaitableFromItem<string> (products.SelectedProduct));
 		}
@@ -234,11 +237,11 @@ public class CustomerSalesDataDialog : IDialog<IMessageActivity>
 		{
 			string functionSecret = ConfigurationManager.AppSettings ["TopCustomersForProductAPIKey"];
 
-			// anotherFunctionUri is another Azure Function's 
-			// public URL, which should provide the secret code stored in app settings 
+			// anotherFunctionUri is another Azure Function's
+			// public URL, which should provide the secret code stored in app settings
 			// with key 'AnotherFunction_secret'
 			//Uri anotherFunctionUri = new Uri(req.RequestUri.AbsoluteUri.Replace(
-			//	req.RequestUri.PathAndQuery, 
+			//	req.RequestUri.PathAndQuery,
 			//	$"/api/AnotherFunction?code={anotherFunctionSecret}"));
 
 			var functionUri = $"https://sapbotdemo-2018.sapbotase.p.azurewebsites.net/api/TopCustomersForProduct?code={functionSecret}";
