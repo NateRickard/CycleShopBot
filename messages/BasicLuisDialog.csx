@@ -45,9 +45,37 @@ public class BasicLuisDialog : LuisDialog<object>
 	[LuisIntent ("Help")]
 	public async Task HelpIntent (IDialogContext context, LuisResult result)
 	{
-		await context.PostAsync ($"I'm the AdventureWorks Sales Bot. You can ask me things like \"Who bought the most Touring Tire in March?\"");
+        var helpMessage = context.MakeMessage();
+        helpMessage.Text = $"I'm the Cycle Shop Sales Bot. You can ask me things like \"Who bought the most Touring Tire in March?\"";
+        helpMessage.SuggestedActions = new SuggestedActions()
+        {
+            Actions = new List<CardAction>()
+            {
+                new CardAction(){ Title = "Show Sample Queries", Type=ActionTypes.ImBack, Value="Show Samples" }
+            }
+        };
+        await context.PostAsync(helpMessage);
 		context.Wait (MessageReceived);
 	}
+
+    [LuisIntent ("Examples")]
+    public async Task ExamplesIntent (IDialogContext context, LuisResult result)
+    {
+        var examplesMessage = context.MakeMessage();
+        examplesMessage.Text = "Here are some sample queries";
+        examplesMessage.SuggestedActions = new SuggestedActions()
+        {
+            Actions = new List<CardAction>()
+            {
+                new CardAction(){ Title = "Top Tire Sales", Type=ActionTypes.ImBack, Value="Show me top sales for Touring Tire in April" },
+                new CardAction(){ Title = "Product List", Type=ActionTypes.ImBack, Value="List Products" },
+                new CardAction(){ Title = "Sales People in UK", Type=ActionTypes.ImBack, Value="Show sales people in UK" }
+            }
+        };
+
+        await context.PostAsync(examplesMessage);
+        context.Wait(MessageReceived);
+    }
 
 	[LuisIntent ("Products")]
 	public async Task ProductsIntent (IDialogContext context, LuisResult result)

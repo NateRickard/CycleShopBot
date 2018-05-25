@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27703.2000
+VisualStudioVersion = 15.0.26730.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{911E67C6-3D85-4FCE-B560-20A9C3E3FF48}") = "Func", "%USERPROFILE%\AppData\Roaming\npm\node_modules\azure-functions-cli\bin\Func.exe", "{C3D4B696-69FC-43D3-9DE6-21FEF4184A2B}"
 	ProjectSection(DebuggerProjectSystem) = preProject
