@@ -213,7 +213,7 @@ public class CustomerSalesDataDialog : IDialog<IMessageActivity>
 		// get SAP data with parameterized query and return it
 		var data = await GetTopCustomerSalesForProduct (selectedProduct, selectedMonth, numberCustomers);
 
-		await context.PostAsync ($"It looks like these are the top {numberCustomers} customers that have purchased {selectedProduct} in the month of {Utils.GetMonthName (selectedMonth)}:");
+		//await context.PostAsync ($"It looks like these are the top {numberCustomers} customers that have purchased {selectedProduct} in the month of {Utils.GetMonthName (selectedMonth)}:");
 
 		// create our reply and add the sales card attachment
 		var replyMessage = context.MakeMessage ();
@@ -294,14 +294,14 @@ public class CustomerSalesDataDialog : IDialog<IMessageActivity>
 					{
 						new AdaptiveTextBlock()
 						{
-							Text = $"Sales Results - {Utils.ToTitleCase(product)}",
+							Text = $"{Utils.GetMonthName(month)} - {Utils.ToTitleCase(product)}",
 							Size = AdaptiveTextSize.ExtraLarge,
 							Weight = AdaptiveTextWeight.Bolder
 						},
-						new AdaptiveTextBlock()
-						{
-							Text = $"Top {numberCustomers} customer sales totals for {Utils.GetMonthName(month)}:"
-						},
+						// new AdaptiveTextBlock()
+						// {
+						// 	Text = $"Top {numberCustomers} customer sales totals for {Utils.GetMonthName(month)}:"
+						// },
 						new AdaptiveFactSet()
 						{
 							Facts = facts
@@ -314,7 +314,7 @@ public class CustomerSalesDataDialog : IDialog<IMessageActivity>
 		card.Actions.Add (
 			new AdaptiveSubmitAction ()
 			{
-				Title = Utils.GetMonthName (monthPrior),
+				Title = "Prev Month", // Utils.GetMonthName (monthPrior),
 				DataJson = $"{{ \"Type\": \"MonthChange\", \"Month\": {monthPrior} }}"
 			}
 		);
@@ -322,7 +322,7 @@ public class CustomerSalesDataDialog : IDialog<IMessageActivity>
 		card.Actions.Add (
 			new AdaptiveSubmitAction ()
 			{
-				Title = Utils.GetMonthName (monthAfter),
+				Title = "Next Month", // Utils.GetMonthName (monthAfter),
 				DataJson = $"{{ \"Type\": \"MonthChange\", \"Month\": {monthAfter} }}"
 			}
 		);
