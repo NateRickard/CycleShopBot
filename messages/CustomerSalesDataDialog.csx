@@ -28,6 +28,13 @@ public class CustomerSalesDataDialog : IDialog<IMessageActivity>
 	const string DateRange = "builtin.datetimeV2.daterange";
 	const string Number = "builtin.number";
 
+	static readonly Dictionary<string, CardSupport?> ChannelCardSupport = new Dictionary<string, CardSupport?> ()
+	{
+		{ "emulator", CardSupport.Thumbnail },
+		{ "webchat", CardSupport.Adaptive },
+		{ "teams", CardSupport.Thumbnail }
+	};
+
 	string selectedProduct;
 	int numberCustomers;
 	(DateTime Min, DateTime Max, int StartIndex, int EndIndex) dateRange;
@@ -50,11 +57,6 @@ public class CustomerSalesDataDialog : IDialog<IMessageActivity>
 		if (products.SelectedProduct != null)
 		{
 			await context.PostAsync ($"Sure, I can help you with sales data for {Utils.ToTitleCase (products.SelectedProduct)}");
-
-			//Send typing indicator
-			var typingIndicator = context.MakeMessage();
-			typingIndicator.Type = ActivityTypes.Typing;
-			await context.PostAsync(typingIndicator);
 
 			await ProductSelected (context, new AwaitableFromItem<string> (products.SelectedProduct));
 		}
@@ -84,19 +86,31 @@ public class CustomerSalesDataDialog : IDialog<IMessageActivity>
 		{
 			// Got an Action Submit!
 			dynamic value = message.Value;
-			string submitType = value.Type.ToString ();
 
-			switch (submitType)
-			{
-				case "MonthChange":
-					int selectedMonth = Convert.ToInt32 (value.Month);
-					await ShowCustomerSalesTotals (context, new AwaitableFromItem<int> (selectedMonth));
-					return;
-			}
+			await processPostBackAction (context, value);
+		}
+		else if (message.Type == "message" && (message.Text?.StartsWith("{") ?? false)) // is this msg possibly json from a CardAction?
+		{
+			dynamic value = JsonConvert.DeserializeObject<dynamic> (message.Text);
+
+			await processPostBackAction (context, value);
 		}
 		else //exit this dialog if we don't understand/handle what's coming in
 		{
 			context.Done (message);
+		}
+	}
+
+	private async Task processPostBackAction (IDialogContext context, dynamic value)
+	{
+		string submitType = value.Type.ToString ();
+
+		switch (submitType)
+		{
+			case "MonthChange":
+				int selectedMonth = Convert.ToInt32 (value.Month);
+				await ShowCustomerSalesTotals (context, new AwaitableFromItem<int> (selectedMonth));
+				return;
 		}
 	}
 
@@ -194,7 +208,7 @@ public class CustomerSalesDataDialog : IDialog<IMessageActivity>
 		//await context.PostAsync ("Getting that information now...");
 
 		// if the date range seems to be more than a 1 month span we need to ket the user know that's not supported
-		if (dateRange.Min.Month != dateRange.Max.AddSeconds(-1).Month) // 1 && (dateRange.Max.Day > 1 || dateRange.Max.TimeOfDay.TotalSeconds > 1))
+		if (dateRange.Min.Month != dateRange.Max.AddSeconds(-1).Month)
 		{
 			context.Call (new MonthSelectionDialog (dateRange.Min, dateRange.Max), ShowCustomerSalesTotals);
 		}
@@ -208,25 +222,38 @@ public class CustomerSalesDataDialog : IDialog<IMessageActivity>
 	{
 		var selectedMonth = await result;
 
-		// show a typing indicator to let the user know we're working on it?
+		await Utils.SendTypingIndicator (context);
 
 		// get SAP data with parameterized query and return it
 		var data = await GetTopCustomerSalesForProduct (selectedProduct, selectedMonth, numberCustomers);
 
-		//await context.PostAsync ($"It looks like these are the top {numberCustomers} customers that have purchased {selectedProduct} in the month of {Utils.GetMonthName (selectedMonth)}:");
+		await Utils.SendTypingIndicator (context);
 
 		// create our reply and add the sales card attachment
 		var replyMessage = context.MakeMessage ();
-		var card = getSalesCard (selectedProduct, numberCustomers, selectedMonth, data);
 
-		// Create the attachment
-		replyMessage.Attachments = new List<Attachment> {
-			new Attachment()
-			{
-				ContentType = AdaptiveCard.ContentType,
-				Content = card
-			}
-		};
+		CardSupport? channelCardSupport = null;
+
+		replyMessage.Attachments = new List<Attachment> ();
+
+		ChannelCardSupport.TryGetValue (context.Activity.ChannelId, out channelCardSupport);
+
+		switch (channelCardSupport ?? CardSupport.Thumbnail)
+		{
+			case CardSupport.Adaptive:
+				replyMessage.Attachments.Add(getAdaptiveSalesCard (selectedProduct, numberCustomers, selectedMonth, data));
+				break;
+			case CardSupport.Thumbnail:
+				replyMessage.AttachmentLayout = AttachmentLayoutTypes.List;
+
+				var cards = getThumbnailSalesCard (selectedProduct, numberCustomers, selectedMonth, data);
+
+				foreach (var card in cards)
+				{
+					replyMessage.Attachments.Add (card);
+				}
+				break;
+		}
 
 		await context.PostAsync (replyMessage);
 
@@ -272,7 +299,7 @@ public class CustomerSalesDataDialog : IDialog<IMessageActivity>
 		}
 	}
 
-	private AdaptiveCard getSalesCard (string product, int numberCustomers, int month, List<CustomerSales> salesData)
+	private Attachment getAdaptiveSalesCard (string product, int numberCustomers, int month, List<CustomerSales> salesData)
 	{
 		var facts = new List<AdaptiveFact> ();
 
@@ -298,10 +325,6 @@ public class CustomerSalesDataDialog : IDialog<IMessageActivity>
 							Size = AdaptiveTextSize.ExtraLarge,
 							Weight = AdaptiveTextWeight.Bolder
 						},
-						// new AdaptiveTextBlock()
-						// {
-						// 	Text = $"Top {numberCustomers} customer sales totals for {Utils.GetMonthName(month)}:"
-						// },
 						new AdaptiveFactSet()
 						{
 							Facts = facts
@@ -314,7 +337,7 @@ public class CustomerSalesDataDialog : IDialog<IMessageActivity>
 		card.Actions.Add (
 			new AdaptiveSubmitAction ()
 			{
-				Title = "Prev Month", // Utils.GetMonthName (monthPrior),
+				Title = "Prev Month",
 				DataJson = $"{{ \"Type\": \"MonthChange\", \"Month\": {monthPrior} }}"
 			}
 		);
@@ -322,11 +345,80 @@ public class CustomerSalesDataDialog : IDialog<IMessageActivity>
 		card.Actions.Add (
 			new AdaptiveSubmitAction ()
 			{
-				Title = "Next Month", // Utils.GetMonthName (monthAfter),
+				Title = "Next Month",
 				DataJson = $"{{ \"Type\": \"MonthChange\", \"Month\": {monthAfter} }}"
 			}
 		);
 
-		return card;
+		return new Attachment ()
+		{
+			ContentType = AdaptiveCard.ContentType,
+			Content = card
+		};
+	}
+
+	private List<Attachment> getThumbnailSalesCard (string product, int numberCustomers, int month, List<CustomerSales> salesData)
+	{
+		var attachments = new List<Attachment> ();
+
+		var titleCard = new ThumbnailCard ()
+		{
+			Title = $"{Utils.GetMonthName (month)} - {Utils.ToTitleCase (product)}"
+		};
+
+		attachments.Add (titleCard.ToAttachment ());
+
+		var monthPrior = month == 1 ? 12 : month - 1;
+		var monthAfter = month == 12 ? 1 : month + 1;
+
+		foreach (var customerSalesData in salesData)
+		{
+			//List<CardImage> cardImages = new List<CardImage> ();
+			//cardImages.Add (new CardImage (url: cardContent.Value));
+
+			var card = new ThumbnailCard ()
+			{
+				Title = $"{customerSalesData.Customer}",
+				Subtitle = $"{customerSalesData.TotalSales:C}"
+			};
+
+			var attachment = card.ToAttachment ();
+			attachments.Add (attachment);
+		}
+
+		var cardButtons = new List<CardAction> ();
+
+		var prevButton = new CardAction ()
+		{
+			Value = $"{{ \"Type\": \"MonthChange\", \"Month\": {monthPrior} }}",
+			Type = "postBack",
+			Title = "Prev Month"
+		};
+
+		cardButtons.Add (prevButton);
+
+		var nextButton = new CardAction ()
+		{
+			Value = $"{{ \"Type\": \"MonthChange\", \"Month\": {monthAfter} }}",
+			Type = "postBack",
+			Title = "Next Month"
+		};
+
+		cardButtons.Add (nextButton);
+
+		var buttonCard = new ThumbnailCard ()
+		{
+			Buttons = cardButtons
+		};
+
+		attachments.Add (buttonCard.ToAttachment ());
+
+		return attachments;
+	}
+
+	enum CardSupport
+	{
+		Thumbnail,
+		Adaptive
 	}
 }
