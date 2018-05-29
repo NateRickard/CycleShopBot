@@ -1,5 +1,6 @@
 #load "Utils.csx"
 #load "CustomerSalesDataDialog.csx"
+#load "EmployeeList.csx"
 
 using System;
 using System.Configuration;
@@ -19,6 +20,7 @@ public class BasicLuisDialog : LuisDialog<object>
 		ConfigurationManager.AppSettings ["LuisAPIKey"],
 		domain: ConfigurationManager.AppSettings ["LuisAPIHostName"])))
 	{
+
 	}
 
 	[LuisIntent ("None")]
@@ -42,10 +44,12 @@ public class BasicLuisDialog : LuisDialog<object>
 		context.Wait (MessageReceived);
 	}
 
-    [LuisIntent ("TestCard")]
-    public async Task TestCardIntent (IDialogContext context, LuisResult result)
+    [LuisIntent ("EmployeeList")]
+    public Task EmployeeListIntent (IDialogContext context, IAwaitable<IMessageActivity> activity, LuisResult result)
     {
-       
+        context.Call(new EmployeeList(result), ResumeAfterDialog);
+
+        return Task.Delay(0);
     }
 
 	[LuisIntent ("Help")]
