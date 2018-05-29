@@ -42,11 +42,17 @@ public class BasicLuisDialog : LuisDialog<object>
 		context.Wait (MessageReceived);
 	}
 
+    [LuisIntent ("TestCard")]
+    public async Task TestCardIntent (IDialogContext context, LuisResult result)
+    {
+       
+    }
+
 	[LuisIntent ("Help")]
 	public async Task HelpIntent (IDialogContext context, LuisResult result)
 	{
         var helpMessage = context.MakeMessage();
-        helpMessage.Text = $"I'm the Cycle Shop Sales Bot. You can ask me things like \"Who bought the most Touring Tire in March?\"";
+        helpMessage.Text = $"I'm the Cycle Shop Sales Bot. You can ask me things like \"Who bought the most Touring Tires in March?\"";
         helpMessage.SuggestedActions = new SuggestedActions()
         {
             Actions = new List<CardAction>()

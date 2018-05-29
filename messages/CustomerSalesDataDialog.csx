@@ -58,7 +58,7 @@ public class CustomerSalesDataDialog : IDialog<IMessageActivity>
 		{
 			await context.PostAsync ($"Sure, I can help you with sales data for {Utils.ToTitleCase (products.SelectedProduct)}");
 
-			await ProductSelected (context, new AwaitableFromItem<string> (products.SelectedProduct));
+            await ProductSelected (context, new AwaitableFromItem<string> (products.SelectedProduct));
 		}
 		else if (products.Products.Count > 0) // if more than one is matched (e.g. "Tires"), go ahead and spin up a selection dialog
 		{
