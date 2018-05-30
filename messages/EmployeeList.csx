@@ -115,13 +115,13 @@ public class EmployeeList : IDialog<IMessageActivity>
         // Add buttons to the card.
         card.Actions.Add(new AdaptiveOpenUrlAction()
         {
-            Url = new Uri($"email:{employee.EmailAddress}"),
+            Url = new Uri($"mailto:{employee.EmailAddress}"),
             Title = $"Email {employee.FirstName}"
         });
 
         card.Actions.Add(new AdaptiveOpenUrlAction()
         {
-            Url = new Uri("phone:{employee.Phone}"),
+            Url = new Uri("tel:{employee.Phone}"),
             Title = $"Call {employee.FirstName}"
         });
 
