@@ -1,5 +1,6 @@
 ﻿#load "Utils.csx"
 #load "EmployeeItem.csx"
+#load "RegionSelectionDialog.csx"
 
 using System;
 using System.Configuration;
@@ -21,6 +22,8 @@ public class EmployeeList : IDialog<IMessageActivity>
     [NonSerialized]
     LuisResult luisResult;
 
+    string selectedRegion = null;
+
     public EmployeeList(LuisResult luisResult)
     {
         this.luisResult = luisResult;
@@ -28,38 +31,60 @@ public class EmployeeList : IDialog<IMessageActivity>
 
     public async Task StartAsync(IDialogContext context)
     {
-        var regions = findRegion(luisResult);
+        var regionCode = findRegion(luisResult);
        
         // try to find an exact product match
-        if (regions > 0)
+        if (regionCode > 0)
         {
-            await Utils.SendTypingIndicator(context);
-            var employees = await GetEmployeeListForRegion(regions);
-            if (employees.Count > 0)
-            {
-                var replyMessage = context.MakeMessage();
-                replyMessage.TextFormat = "markdown";
-                foreach (var emp in employees)
-                {
-                    replyMessage.Text += $"{emp.FirstName} {emp.LastName}\n\n";
-                }
-                await context.PostAsync(replyMessage);
-                context.Wait(MessageReceived);
-            }
+            await DisplayEmployeeList(context, regionCode, "");
         }
         else
         {
-            context.Fail(new Exception("No employees for that region were found"));
+            context.Call(new RegionSelectionDialog(), RegionSelected);
         }
     }
-    private async Task<List<EmployeeItem>> GetEmployeeListForRegion(int region)
+
+    private async Task RegionSelected(IDialogContext context, IAwaitable<string> regionResult)
+    {
+        selectedRegion = await regionResult;
+       
+        await DisplayEmployeeList(context, 0, selectedRegion);
+
+    }
+
+    /// <summary>
+    /// Must have either regionCode or region supplied.
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="regionCode"></param>
+    /// <param name="region"></param>
+    /// <returns></returns>
+    private async Task DisplayEmployeeList(IDialogContext context, int regionCode, string region)
+    {
+        await Utils.SendTypingIndicator(context);
+        var employees = await GetEmployeeListForRegion(regionCode, region);
+        if (employees.Count > 0)
+        {
+            var replyMessage = context.MakeMessage();
+            replyMessage.TextFormat = "markdown";
+            foreach (var emp in employees)
+            {
+                replyMessage.Text += $"{emp.FirstName} {emp.LastName}\n\n";
+            }
+            await context.PostAsync(replyMessage);
+            context.Wait(MessageReceived);
+        }
+    }
+
+
+    private async Task<List<EmployeeItem>> GetEmployeeListForRegion(int regionCode, string region)
     {
         using (var client = new HttpClient())
         {
             string functionSecret = ConfigurationManager.AppSettings["EmployeeListAPIKey"];
         
             var functionUri = $"https://sapbotdemo-2018.sapbotase.p.azurewebsites.net/api/SalesPeopleInRegion?code={functionSecret}";
-            functionUri += $"&region={region}";
+            functionUri += $"&regionCode={regionCode}&region={region}";
 
             var response = await client.PostAsync(functionUri, null);
 
