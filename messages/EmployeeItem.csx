@@ -5,6 +5,7 @@ using System.Globalization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
+[Serializable]
 public partial class EmployeeItem
 {
     [JsonProperty("EmployeeKey")]
@@ -69,6 +70,14 @@ public partial class EmployeeItem
 
     [JsonProperty("Status")]
     public string Status { get; set; }
+
+    public string FullName
+    {
+        get
+        {
+            return FirstName + " " + LastName;
+        }
+    }
 }
 
 

@@ -1,6 +1,7 @@
 ﻿#load "Utils.csx"
 #load "EmployeeItem.csx"
 #load "RegionSelectionDialog.csx"
+#load "EmployeeSelectionDialog.csx"
 
 using System;
 using System.Configuration;
@@ -15,14 +16,19 @@ using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Luis;
 using Microsoft.Bot.Builder.Luis.Models;
 using Microsoft.Bot.Connector;
+using AdaptiveCards;
 
 [Serializable]
 public class EmployeeList : IDialog<IMessageActivity>
 {
+    string selectedRegion = null;
+    string selectedEmployeeID = null;
+    List<EmployeeItem> employees;
+
     [NonSerialized]
     LuisResult luisResult;
 
-    string selectedRegion = null;
+    
 
     public EmployeeList(LuisResult luisResult)
     {
@@ -52,6 +58,13 @@ public class EmployeeList : IDialog<IMessageActivity>
 
     }
 
+    private async Task EmployeeSelected(IDialogContext context, IAwaitable<string> employeeResult)
+    {
+        selectedEmployeeID = await employeeResult;
+
+        await DisplayEmployeeCard(context, selectedEmployeeID);
+    }
+
     /// <summary>
     /// Must have either regionCode or region supplied.
     /// </summary>
@@ -62,20 +75,66 @@ public class EmployeeList : IDialog<IMessageActivity>
     private async Task DisplayEmployeeList(IDialogContext context, int regionCode, string region)
     {
         await Utils.SendTypingIndicator(context);
-        var employees = await GetEmployeeListForRegion(regionCode, region);
+        employees = await GetEmployeeListForRegion(regionCode, region);
         if (employees.Count > 0)
         {
-            var replyMessage = context.MakeMessage();
-            replyMessage.TextFormat = "markdown";
-            foreach (var emp in employees)
-            {
-                replyMessage.Text += $"{emp.FirstName} {emp.LastName}\n\n";
-            }
-            await context.PostAsync(replyMessage);
-            context.Wait(MessageReceived);
+            context.Call(new EmployeeSelectionDialog(employees), EmployeeSelected);
         }
     }
 
+    private async Task DisplayEmployeeCard(IDialogContext context, string employeeId)
+    {
+        await Utils.SendTypingIndicator(context);
+
+        var employee = employees.Where(x => x.EmployeeKey == long.Parse(employeeId)).First();
+
+        var replyToConversation = context.MakeMessage();
+        replyToConversation.Attachments = new List<Attachment>();
+        AdaptiveCard card = new AdaptiveCard();
+            
+        // Add text to the card.
+        card.Body.Add(new AdaptiveTextBlock()
+        {
+            Text = employee.FullName,
+            Size = AdaptiveTextSize.Large,
+            Weight = AdaptiveTextWeight.Bolder
+        });
+
+        // Add text to the card.
+        card.Body.Add(new AdaptiveTextBlock()
+        {
+            Text = employee.Title
+        });
+
+        // Add text to the card.
+        card.Body.Add(new AdaptiveTextBlock()
+        {
+            Text = $"Vacation: {employee.VacationHours}"
+        });
+
+        // Add buttons to the card.
+        card.Actions.Add(new AdaptiveOpenUrlAction()
+        {
+            Url = new Uri($"email:{employee.EmailAddress}"),
+            Title = $"Email {employee.FirstName}"
+        });
+
+        card.Actions.Add(new AdaptiveOpenUrlAction()
+        {
+            Url = new Uri("phone:{employee.Phone}"),
+            Title = $"Call {employee.FirstName}"
+        });
+
+        card.Actions.Add(new AdaptiveOpenUrlAction()
+        {
+            Url = new Uri($"sms:{employee.Phone}"),
+            Title = $"Text {employee.FirstName}"
+        });
+
+        replyToConversation.Attachments.Add(new Attachment() { ContentType = AdaptiveCard.ContentType, Content = card }) ;
+        await context.PostAsync(replyToConversation);
+        context.Wait(MessageReceived);
+    }
 
     private async Task<List<EmployeeItem>> GetEmployeeListForRegion(int regionCode, string region)
     {
