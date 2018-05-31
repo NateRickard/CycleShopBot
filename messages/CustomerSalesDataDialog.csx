@@ -57,7 +57,7 @@ public class CustomerSalesDataDialog : IDialog<IMessageActivity>
 		if (products.SelectedProduct != null)
 		{
 			await context.PostAsync ($"Sure, I can help you with sales data for {Utils.ToTitleCase (products.SelectedProduct)}");
-            await Utils.SendTypingIndicator(context);
+
             await ProductSelected (context, new AwaitableFromItem<string> (products.SelectedProduct));
 		}
 		else if (products.Products.Count > 0) // if more than one is matched (e.g. "Tires"), go ahead and spin up a selection dialog
@@ -224,7 +224,7 @@ public class CustomerSalesDataDialog : IDialog<IMessageActivity>
 	{
 		var selectedMonth = await result;
 
-		//await Utils.SendTypingIndicator (context);
+		await Utils.SendTypingIndicator (context);
 
 		// get SAP data with parameterized query and return it
 		var data = await GetTopCustomerSalesForProduct (selectedProduct, selectedMonth, numberCustomers);
