@@ -1,5 +1,6 @@
 #load "Utils.csx"
 #load "CustomerSalesDataDialog.csx"
+#load "EmployeeList.csx"
 
 using System;
 using System.Configuration;
@@ -19,6 +20,7 @@ public class BasicLuisDialog : LuisDialog<object>
 		ConfigurationManager.AppSettings ["LuisAPIKey"],
 		domain: ConfigurationManager.AppSettings ["LuisAPIHostName"])))
 	{
+
 	}
 
 	[LuisIntent ("None")]
@@ -42,11 +44,19 @@ public class BasicLuisDialog : LuisDialog<object>
 		context.Wait (MessageReceived);
 	}
 
+    [LuisIntent ("EmployeeList")]
+    public Task EmployeeListIntent (IDialogContext context, IAwaitable<IMessageActivity> activity, LuisResult result)
+    {
+        context.Call(new EmployeeList(result), ResumeAfterDialog);
+
+        return Task.Delay(0);
+    }
+
 	[LuisIntent ("Help")]
 	public async Task HelpIntent (IDialogContext context, LuisResult result)
 	{
         var helpMessage = context.MakeMessage();
-        helpMessage.Text = $"I'm the Cycle Shop Sales Bot. You can ask me things like \"Who bought the most Touring Tire in March?\"";
+        helpMessage.Text = $"I'm the Cycle Shop Sales Bot. You can ask me things like \"Who bought the most Touring Tires in March?\"";
         helpMessage.SuggestedActions = new SuggestedActions()
         {
             Actions = new List<CardAction>()
@@ -88,7 +98,17 @@ public class BasicLuisDialog : LuisDialog<object>
 		context.Wait (MessageReceived);
 	}
 
-	[LuisIntent ("TopCustomersForProduct")]
+    [LuisIntent("Regions")]
+    public async Task RegionsIntent(IDialogContext context, LuisResult result)
+    {
+        var replyMessage = context.MakeMessage();
+        replyMessage.TextFormat = "markdown";
+        replyMessage.Text = $"Cycle Shop Regions\n\n-Northwest\n-Northeast\n-Central\n-Southwest\n-Southeast\n-Canada\n-France\n-Germany\n-UK";
+        await context.PostAsync(replyMessage);
+        context.Wait(MessageReceived);
+    }
+
+    [LuisIntent ("TopCustomersForProduct")]
 	public Task TopCustomersForProductIntent (IDialogContext context, IAwaitable<IMessageActivity> activity, LuisResult result)
 	{
 		context.Call (new CustomerSalesDataDialog (result), ResumeAfterDialog);

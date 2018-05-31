@@ -29,8 +29,17 @@ module.exports = function (context, req) {
         if (req.query.count)
             numtoreturn = req.query.count
 
-        var query = `SELECT TOP ` + numtoreturn + ` * FROM "DEMODB"."DimEmployee"
-            WHERE "SalesTerritoryKey" = ` + req.query.region
+        var query
+        if (req.query.regionCode > 0)
+        {
+            query = `SELECT TOP ` + numtoreturn + ` * FROM "DEMODB"."DimEmployee"
+            WHERE "SalesTerritoryKey" = ` + req.query.regionCode
+        } else
+        {
+            query = `SELECT TOP ` + numtoreturn + ` * FROM "DEMODB"."DimEmployee"
+            INNER JOIN "DEMODB"."DimSalesTerritory" ON "DEMODB"."DimEmployee"."SalesTerritoryKey" = "DEMODB"."DimSalesTerritory"."SalesTerritoryKey"
+            WHERE "DEMODB"."DimSalesTerritory"."SalesTerritoryRegion" = '` + req.query.region + `'`
+        }
 
         client.exec(query, function(err, rows) {
 	        client.end();

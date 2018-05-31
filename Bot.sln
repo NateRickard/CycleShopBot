@@ -20,6 +20,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		commands.json = commands.json
 		debughost.cmd = debughost.cmd
+		local.settings.json = local.settings.json
 		readme.md = readme.md
 	EndProjectSection
 EndProject
@@ -29,11 +30,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "messages", "messages", "{F4
 		messages\CustomerSales.csx = messages\CustomerSales.csx
 		messages\CustomerSalesDataDialog.csx = messages\CustomerSalesDataDialog.csx
 		messages\DecimalConverter.csx = messages\DecimalConverter.csx
+		messages\EmployeeItem.csx = messages\EmployeeItem.csx
+		messages\EmployeeList.csx = messages\EmployeeList.csx
+		messages\EmployeeSelectionDialog.csx = messages\EmployeeSelectionDialog.csx
 		messages\function.json = messages\function.json
 		messages\MonthSelectionDialog.csx = messages\MonthSelectionDialog.csx
 		messages\ProductSelectionDialog.csx = messages\ProductSelectionDialog.csx
 		messages\project.json = messages\project.json
 		messages\project.lock.json = messages\project.lock.json
+		messages\RegionSelectionDialog.csx = messages\RegionSelectionDialog.csx
 		messages\run.csx = messages\run.csx
 		messages\Utils.csx = messages\Utils.csx
 	EndProjectSection
