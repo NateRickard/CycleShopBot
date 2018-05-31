@@ -68,7 +68,7 @@ public class CustomerSalesDataDialog : IDialog<IMessageActivity>
 			}
 			else
 			{
-				await context.PostAsync ($"Your request matched too many products. Please try a more specific product name.");
+				await context.PostAsync ("Your request matched too many products. Please try a more specific product name.");
 				context.Fail (new Exception ("Too many products matched"));
 			}
 		}
@@ -82,9 +82,8 @@ public class CustomerSalesDataDialog : IDialog<IMessageActivity>
 	{
 		var message = await item;
 
-		if (message.Value != null)
+		if (message.Value != null) // adaptive cards postback with a message Value
 		{
-			// Got an Action Submit!
 			dynamic value = message.Value;
 
 			await processPostBackAction (context, value);
@@ -109,6 +108,9 @@ public class CustomerSalesDataDialog : IDialog<IMessageActivity>
 		{
 			case "MonthChange":
 				int selectedMonth = Convert.ToInt32 (value.Month);
+
+				await context.PostAsync ($"Ok, getting the data for {Utils.GetMonthName(selectedMonth)}");
+
 				await ShowCustomerSalesTotals (context, new AwaitableFromItem<int> (selectedMonth));
 				return;
 		}
@@ -227,32 +229,36 @@ public class CustomerSalesDataDialog : IDialog<IMessageActivity>
 		// get SAP data with parameterized query and return it
 		var data = await GetTopCustomerSalesForProduct (selectedProduct, selectedMonth, numberCustomers);
 
-		await Utils.SendTypingIndicator (context);
-
-		// create our reply and add the sales card attachment
-		var replyMessage = context.MakeMessage ();
-
 		CardSupport? channelCardSupport = null;
 
-		replyMessage.Attachments = new List<Attachment> ();
+		var attachments = new List<Attachment> ();
 
 		ChannelCardSupport.TryGetValue (context.Activity.ChannelId, out channelCardSupport);
 
 		switch (channelCardSupport ?? CardSupport.Thumbnail)
 		{
 			case CardSupport.Adaptive:
-				replyMessage.Attachments.Add(getAdaptiveSalesCard (selectedProduct, numberCustomers, selectedMonth, data));
+
+				attachments.Add(getAdaptiveSalesCard (selectedProduct, numberCustomers, selectedMonth, data));
 				break;
 			case CardSupport.Thumbnail:
-				replyMessage.AttachmentLayout = AttachmentLayoutTypes.List;
 
 				var cards = getThumbnailSalesCard (selectedProduct, numberCustomers, selectedMonth, data);
 
 				foreach (var card in cards)
 				{
-					replyMessage.Attachments.Add (card);
+					attachments.Add (card);
 				}
 				break;
+		}
+
+		// create our reply and add the sales card attachment
+		var replyMessage = context.MakeMessage ();
+		replyMessage.Attachments = new List<Attachment> (attachments);
+
+		if (attachments.Count > 0)
+		{
+			replyMessage.AttachmentLayout = AttachmentLayoutTypes.List;
 		}
 
 		await context.PostAsync (replyMessage);
@@ -373,9 +379,6 @@ public class CustomerSalesDataDialog : IDialog<IMessageActivity>
 
 		foreach (var customerSalesData in salesData)
 		{
-			//List<CardImage> cardImages = new List<CardImage> ();
-			//cardImages.Add (new CardImage (url: cardContent.Value));
-
 			var card = new ThumbnailCard ()
 			{
 				Title = $"{customerSalesData.Customer}",
