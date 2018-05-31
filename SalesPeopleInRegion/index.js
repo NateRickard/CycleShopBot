@@ -41,7 +41,6 @@ module.exports = function (context, req) {
             WHERE "DEMODB"."DimSalesTerritory"."SalesTerritoryRegion" = '` + req.query.region + `'`
         }
 
-
         client.exec(query, function(err, rows) {
 	        client.end();
 
