@@ -2,6 +2,7 @@
 #load "EmployeeItem.csx"
 #load "RegionSelectionDialog.csx"
 #load "EmployeeSelectionDialog.csx"
+#load "EmployeeCard.csx"
 
 using System;
 using System.Configuration;
@@ -42,7 +43,7 @@ public class EmployeeList : IDialog<IMessageActivity>
         // try to find an exact product match
         if (regionCode > 0)
         {
-            await DisplayEmployeeList(context, regionCode, "");
+            await DisplayEmployeeList(context, regionCode, "None");
         }
         else
         {
@@ -90,46 +91,8 @@ public class EmployeeList : IDialog<IMessageActivity>
 
         var replyToConversation = context.MakeMessage();
         replyToConversation.Attachments = new List<Attachment>();
-        AdaptiveCard card = new AdaptiveCard();
-            
-        // Add text to the card.
-        card.Body.Add(new AdaptiveTextBlock()
-        {
-            Text = employee.FullName,
-            Size = AdaptiveTextSize.Large,
-            Weight = AdaptiveTextWeight.Bolder
-        });
 
-        // Add text to the card.
-        card.Body.Add(new AdaptiveTextBlock()
-        {
-            Text = employee.Title
-        });
-
-        // Add text to the card.
-        card.Body.Add(new AdaptiveTextBlock()
-        {
-            Text = $"Vacation: {employee.VacationHours}"
-        });
-
-        // Add buttons to the card.
-        card.Actions.Add(new AdaptiveOpenUrlAction()
-        {
-            Url = new Uri($"mailto:{employee.EmailAddress}"),
-            Title = $"Email {employee.FirstName}"
-        });
-
-        card.Actions.Add(new AdaptiveOpenUrlAction()
-        {
-            Url = new Uri("tel:{employee.Phone}"),
-            Title = $"Call {employee.FirstName}"
-        });
-
-        card.Actions.Add(new AdaptiveOpenUrlAction()
-        {
-            Url = new Uri($"sms:{employee.Phone}"),
-            Title = $"Text {employee.FirstName}"
-        });
+        AdaptiveCard card = new EmployeeCard(employee);
 
         replyToConversation.Attachments.Add(new Attachment() { ContentType = AdaptiveCard.ContentType, Content = card }) ;
         await context.PostAsync(replyToConversation);
