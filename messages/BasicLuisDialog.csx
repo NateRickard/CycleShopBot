@@ -98,7 +98,17 @@ public class BasicLuisDialog : LuisDialog<object>
 		context.Wait (MessageReceived);
 	}
 
-	[LuisIntent ("TopCustomersForProduct")]
+    [LuisIntent("Regions")]
+    public async Task RegionsIntent(IDialogContext context, LuisResult result)
+    {
+        var replyMessage = context.MakeMessage();
+        replyMessage.TextFormat = "markdown";
+        replyMessage.Text = $"Cycle Shop Regions\n\n-Northwest\n-Northeast\n-Central\n-Southwest\n-Southeast\n-Canada\n-France\n-Germany\n-UK";
+        await context.PostAsync(replyMessage);
+        context.Wait(MessageReceived);
+    }
+
+    [LuisIntent ("TopCustomersForProduct")]
 	public Task TopCustomersForProductIntent (IDialogContext context, IAwaitable<IMessageActivity> activity, LuisResult result)
 	{
 		context.Call (new CustomerSalesDataDialog (result), ResumeAfterDialog);
