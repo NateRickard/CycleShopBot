@@ -76,7 +76,7 @@ public class EmployeeList : IDialog<IMessageActivity>
     private async Task DisplayEmployeeList(IDialogContext context, int regionCode, string region)
     {
         await Utils.SendTypingIndicator(context);
-        employees = await GetEmployeeListForRegion(regionCode, region);
+        employees = await GetEmployeeListForRegion(context, regionCode, region);
         if (employees.Count > 0)
         {
             context.Call(new EmployeeSelectionDialog(employees), EmployeeSelected);
@@ -99,14 +99,13 @@ public class EmployeeList : IDialog<IMessageActivity>
         context.Wait(MessageReceived);
     }
 
-    private async Task<List<EmployeeItem>> GetEmployeeListForRegion(int regionCode, string region)
+    private async Task<List<EmployeeItem>> GetEmployeeListForRegion(IDialogContext context, int regionCode, string region)
     {
         using (var client = new HttpClient())
         {
-            string functionSecret = ConfigurationManager.AppSettings["EmployeeListAPIKey"];
-        
-            var functionUri = $"https://sapbotdemo-2018.sapbotase.p.azurewebsites.net/api/SalesPeopleInRegion?code={functionSecret}";
-            functionUri += $"&regionCode={regionCode}&region={region}";
+			var functionUri = Utils.GetFunctionUrl (context, "SalesPeopleInRegion",
+				(nameof (regionCode), regionCode),
+				(nameof (region), region));
 
             var response = await client.PostAsync(functionUri, null);
 

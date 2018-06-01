@@ -5,8 +5,6 @@
 #load "ProductSelectionDialog.csx"
 
 using System;
-using System.Configuration;
-using System.Web;
 
 using Microsoft.Bot.Builder.Azure;
 using Microsoft.Bot.Builder.Dialogs;
@@ -207,8 +205,6 @@ public class CustomerSalesDataDialog : IDialog<IMessageActivity>
 	{
 		selectedProduct = await productResult;
 
-		//await context.PostAsync ("Getting that information now...");
-
 		// if the date range seems to be more than a 1 month span we need to ket the user know that's not supported
 		if (dateRange.Min.Month != dateRange.Max.AddSeconds(-1).Month)
 		{
@@ -224,10 +220,11 @@ public class CustomerSalesDataDialog : IDialog<IMessageActivity>
 	{
 		var selectedMonth = await result;
 
+		// show typing indicator before we go get the SAP data
 		await Utils.SendTypingIndicator (context);
 
 		// get SAP data with parameterized query and return it
-		var data = await GetTopCustomerSalesForProduct (selectedProduct, selectedMonth, numberCustomers);
+		var data = await GetTopCustomerSalesForProduct (context, selectedProduct, selectedMonth, numberCustomers);
 
 		CardSupport? channelCardSupport = null;
 
@@ -266,23 +263,14 @@ public class CustomerSalesDataDialog : IDialog<IMessageActivity>
 		context.Wait (MessageReceived);
 	}
 
-	private async Task<List<CustomerSales>> GetTopCustomerSalesForProduct (string product, int month, int numberCustomers = 5)
+	private async Task<List<CustomerSales>> GetTopCustomerSalesForProduct (IDialogContext context, string product, int month, int count = 5)
 	{
 		using (var client = new HttpClient ())
 		{
-			string functionSecret = ConfigurationManager.AppSettings ["TopCustomersForProductAPIKey"];
-
-			// anotherFunctionUri is another Azure Function's
-			// public URL, which should provide the secret code stored in app settings
-			// with key 'AnotherFunction_secret'
-			//Uri anotherFunctionUri = new Uri(req.RequestUri.AbsoluteUri.Replace(
-			//	req.RequestUri.PathAndQuery,
-			//	$"/api/AnotherFunction?code={anotherFunctionSecret}"));
-
-			var functionUri = $"https://sapbotdemo-2018.sapbotase.p.azurewebsites.net/api/TopCustomersForProduct?code={functionSecret}";
-			functionUri += $"&product={HttpUtility.UrlEncode (product)}";
-			functionUri += $"&month={month}";
-			functionUri += $"&count={numberCustomers}";
+			var functionUri = Utils.GetFunctionUrl (context, "TopCustomersForProduct", 
+				(nameof(product), product),
+				(nameof(month), month),
+				(nameof(count), count));
 
 			var response = await client.PostAsync (functionUri, null);
 
