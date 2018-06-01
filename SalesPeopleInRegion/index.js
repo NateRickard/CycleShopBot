@@ -48,7 +48,7 @@ module.exports = function (context, req) {
             return context.log('Execute error:', err);
             }
 
-            if (req.query.region) {
+            if (req.query.region || req.query.regionCode) {
                 context.res = {
                     // status: 200, /* Defaults to 200 */
                     body: JSON.stringify(rows)
@@ -57,7 +57,7 @@ module.exports = function (context, req) {
             else {
                 context.res = {
                     status: 400,
-                    body: "Please pass region number in query string"
+                    body: "Please pass region number or regionCode in query string"
                 };
             }
             context.done();
