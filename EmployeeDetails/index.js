@@ -29,10 +29,10 @@ module.exports = function (context, req) {
 	        client.end();
 
             if (err) {
-            return context.log('Execute error:', err);
+               return context.log('Execute error:', err);
             }
 
-            if (req.query.region) {
+            if (req.query.employeeid) {
                 context.res = {
                     // status: 200, /* Defaults to 200 */
                     body: JSON.stringify(rows)
