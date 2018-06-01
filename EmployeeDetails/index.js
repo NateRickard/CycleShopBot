@@ -41,7 +41,7 @@ module.exports = function (context, req) {
             else {
                 context.res = {
                     status: 400,
-                    body: "Please pass employeeid in query string"
+                    body: "Please pass employeeid in query string " + err
                 };
             }
             context.done();
