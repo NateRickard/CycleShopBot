@@ -28,7 +28,10 @@ public static async Task<object> Run(HttpRequestMessage req, TraceWriter log)
 {
     log.Info($"Webhook was triggered!");
 
-	BaseFunctionUrl = req.RequestUri.AbsoluteUri.Replace (req.RequestUri.PathAndQuery, "");
+	if (BaseFunctionUrl == null)
+	{
+		BaseFunctionUrl = req.RequestUri.AbsoluteUri.Replace (req.RequestUri.PathAndQuery, "");
+	}
 
 	// Initialize the azure bot
 	using (BotService.Initialize())
