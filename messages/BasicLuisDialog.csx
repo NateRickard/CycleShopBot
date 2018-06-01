@@ -1,6 +1,7 @@
 #load "Utils.csx"
 #load "CustomerSalesDataDialog.csx"
 #load "EmployeeList.csx"
+#load "EmployeeDetails.csx"
 
 using System;
 using System.Configuration;
@@ -49,7 +50,15 @@ public class BasicLuisDialog : LuisDialog<object>
         return Task.Delay(0);
     }
 
-	[LuisIntent ("Help")]
+    [LuisIntent ("EmployeeDetails")]
+    public Task EmployeeDetailsIntent(IDialogContext context, IAwaitable<IMessageActivity> activity, LuisResult result)
+    {
+        context.Call(new EmployeeDetails(result), ResumeAfterDialog);
+
+        return Task.Delay(0);
+    }
+
+    [LuisIntent ("Help")]
 	public async Task HelpIntent (IDialogContext context, LuisResult result)
 	{
         var helpMessage = context.MakeMessage();
