@@ -41,6 +41,8 @@ public static class Utils
 
 		var baseUrl = context.Activity.ServiceUrl;
 
+		context.PostAsync ("baseUrl url is:" + baseUrl);
+
 		if (baseUrl.Contains ("localhost")) //can't hit SAP locally so we need to hit the prod functions here
 		{
 			baseUrl = ConfigurationManager.AppSettings ["DefaultFunctionUrl"];
