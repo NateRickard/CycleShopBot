@@ -39,16 +39,16 @@ public static class Utils
 
 		//var portStart = context.Activity.ServiceUrl.LastIndexOf (':');
 
-		var baseUrl = context.Activity.ServiceUrl;
+		//var baseUrl = context.Activity.ServiceUrl;
 
-		context.PostAsync ("baseUrl url is:" + baseUrl);
+		context.PostAsync ("baseUrl url is:" + BaseFunctionUrl);
 
-		if (baseUrl.Contains ("localhost")) //can't hit SAP locally so we need to hit the prod functions here
+		if (BaseFunctionUrl.Contains ("localhost")) //can't hit SAP locally so we need to hit the prod functions here
 		{
-			baseUrl = ConfigurationManager.AppSettings ["DefaultFunctionUrl"];
+			BaseFunctionUrl = ConfigurationManager.AppSettings ["DefaultFunctionUrl"];
 		}
 
-		var functionUrl = $"{baseUrl}/api/{functionName}?code={functionSecret}";
+		var functionUrl = $"{BaseFunctionUrl}/api/{functionName}?code={functionSecret}";
 
 		if (args != null)
 		{

@@ -22,12 +22,16 @@ using Microsoft.Bot.Connector;
 // -CosmosDbEndpoint set to your cosmos db endpoint
 // -CosmosDbKey set to your cosmos db key
 
+static string BaseFunctionUrl;
+
 public static async Task<object> Run(HttpRequestMessage req, TraceWriter log)
 {
     log.Info($"Webhook was triggered!");
 
-    // Initialize the azure bot
-    using (BotService.Initialize())
+	BaseFunctionUrl = req.RequestUri.AbsoluteUri.Replace (req.RequestUri.PathAndQuery, "");
+
+	// Initialize the azure bot
+	using (BotService.Initialize())
     {
         // Deserialize the incoming activity
         string jsonContent = await req.Content.ReadAsStringAsync();
