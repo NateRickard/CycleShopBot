@@ -28,7 +28,10 @@ public static async Task<object> Run(HttpRequestMessage req, TraceWriter log)
 {
     log.Info($"Webhook was triggered!");
 
-	BaseFunctionUrl = req.RequestUri.AbsoluteUri.Replace (req.RequestUri.PathAndQuery, "");
+	if (BaseFunctionUrl == null)
+	{
+		BaseFunctionUrl = req.RequestUri.AbsoluteUri.Replace (req.RequestUri.PathAndQuery, "");
+	}
 
 	// Initialize the azure bot
 	using (BotService.Initialize())
@@ -54,24 +57,24 @@ public static async Task<object> Run(HttpRequestMessage req, TraceWriter log)
                     await Conversation.SendAsync(activity, () => new BasicLuisDialog());
                     break;
                 case ActivityTypes.ConversationUpdate:
-                    var client = new ConnectorClient(new Uri(activity.ServiceUrl));
-                    IConversationUpdateActivity update = activity;
-                    if (update.MembersAdded.Any())
-                    {
-                        var reply = activity.CreateReply();
-                        var newMembers = update.MembersAdded?.Where(t => t.Id != activity.Recipient.Id);
-                        foreach (var newMember in newMembers)
-                        {
-                            reply.Text = "Welcome";
-                            if (!string.IsNullOrEmpty(newMember.Name))
-                            {
-                                reply.Text += $" {newMember.Name}";
-                            }
-                            reply.Text += "!";
-                            await client.Conversations.ReplyToActivityAsync(reply);
-                        }
-                    }
-                    break;
+                    //var client = new ConnectorClient(new Uri(activity.ServiceUrl));
+                    //IConversationUpdateActivity update = activity;
+                    //if (update.MembersAdded.Any())
+                    //{
+                    //    var reply = activity.CreateReply();
+                    //    var newMembers = update.MembersAdded?.Where(t => t.Id != activity.Recipient.Id);
+                    //    foreach (var newMember in newMembers)
+                    //    {
+                    //        reply.Text = "Welcome";
+                    //        if (!string.IsNullOrEmpty(newMember.Name))
+                    //        {
+                    //            reply.Text += $" {newMember.Name}";
+                    //        }
+                    //        reply.Text += "!";
+                    //        await client.Conversations.ReplyToActivityAsync(reply);
+                    //    }
+                    //}
+                    //break;
                 case ActivityTypes.ContactRelationUpdate:
                 case ActivityTypes.Typing:
                 case ActivityTypes.DeleteUserData:
