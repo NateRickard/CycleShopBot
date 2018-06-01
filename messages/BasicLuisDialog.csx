@@ -32,8 +32,6 @@ public class BasicLuisDialog : LuisDialog<object>
 	[LuisIntent ("Greeting")]
 	public async Task GreetingIntent (IDialogContext context, LuisResult result)
 	{
-		await context.PostAsync ($"Greetings!");
-
 		await HelpIntent (context, result);
 	}
 
@@ -56,7 +54,7 @@ public class BasicLuisDialog : LuisDialog<object>
 	public async Task HelpIntent (IDialogContext context, LuisResult result)
 	{
         var helpMessage = context.MakeMessage();
-        helpMessage.Text = $"I'm the Cycle Shop Sales Bot. You can ask me things like \"Who bought the most Touring Tires in March?\"";
+        helpMessage.Text = $"Hi! I'm the Cycle Shop Sales Bot. You can ask me things like \"Who bought the most Touring Tires in March?\"";
         helpMessage.SuggestedActions = new SuggestedActions()
         {
             Actions = new List<CardAction>()
@@ -79,7 +77,7 @@ public class BasicLuisDialog : LuisDialog<object>
             {
                 new CardAction(){ Title = "Top Tire Sales", Type=ActionTypes.ImBack, Value="Show me top sales for Touring Tire in April" },
                 new CardAction(){ Title = "Product List", Type=ActionTypes.ImBack, Value="List Products" },
-                new CardAction(){ Title = "Sales People in UK", Type=ActionTypes.ImBack, Value="Show sales people in UK" }
+                new CardAction(){ Title = "Employees in UK", Type=ActionTypes.ImBack, Value="Show employees in UK" }
             }
         };
 
