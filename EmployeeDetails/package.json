@@ -1,0 +1,14 @@
+{
+   "name": "EmployeeDetails",
+   "version": "1.0.0",
+   "description": "Returns details for employee ID",
+   "main": "index.js",
+   "scripts": {
+     "test": "echo \"Error: no test specified\" && exit 1"
+   },
+   "author": "Steve Hall",
+   "license": "MIT",
+   "dependencies": {
+     "hdb": "^0.15.0"
+   }
+ }
