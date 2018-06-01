@@ -37,11 +37,7 @@ public static class Utils
 	{
 		string functionSecret = ConfigurationManager.AppSettings [$"{functionName}APIKey"];
 
-		//var portStart = context.Activity.ServiceUrl.LastIndexOf (':');
-
-		//var baseUrl = context.Activity.ServiceUrl;
-
-		context.PostAsync ("baseUrl url is:" + BaseFunctionUrl);
+		//context.PostAsync ("baseUrl url is:" + BaseFunctionUrl);
 
 		if (BaseFunctionUrl.Contains ("localhost")) //can't hit SAP locally so we need to hit the prod functions here
 		{
