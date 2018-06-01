@@ -23,14 +23,7 @@ module.exports = function (context, req) {
          	return context.log('Connect error', err);
         }
 
-        //Default query parameters
-        var numtoreturn = 10
-
-        if (req.query.count)
-            numtoreturn = req.query.count
-
-        var query = `SELECT * FROM "DEMODB"."DimEmployee"
-            WHERE "EmployeeKey" = ` + req.query.employeeid
+        var query = `SELECT * FROM "DEMODB"."DimEmployee" WHERE "EmployeeKey" = ` + req.query.employeeid
 
         client.exec(query, function(err, rows) {
 	        client.end();
