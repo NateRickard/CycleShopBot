@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Configuration;
 using System.Globalization;
+using System.Web;
 
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Connector;
@@ -29,5 +31,29 @@ public static class Utils
 		var typingIndicator = context.MakeMessage ();
 		typingIndicator.Type = ActivityTypes.Typing;
 		await context.PostAsync (typingIndicator);
+	}
+
+	public static string GetFunctionUrl (IDialogContext context, string functionName, params (string Name, object Value)[] args)
+	{
+		string functionSecret = ConfigurationManager.AppSettings [$"{functionName}APIKey"];
+
+		//context.PostAsync ("baseUrl url is:" + BaseFunctionUrl);
+
+		if (BaseFunctionUrl.Contains ("localhost")) //can't hit SAP locally so we need to hit the prod functions here
+		{
+			BaseFunctionUrl = ConfigurationManager.AppSettings ["DefaultFunctionUrl"];
+		}
+
+		var functionUrl = $"{BaseFunctionUrl}/api/{functionName}?code={functionSecret}";
+
+		if (args != null)
+		{
+			foreach (var arg in args)
+			{
+				functionUrl += $"&{arg.Name}={HttpUtility.UrlEncode (arg.Value.ToString ())}";
+			}
+		}
+
+		return functionUrl;
 	}
 }

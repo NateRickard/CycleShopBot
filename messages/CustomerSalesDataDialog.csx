@@ -5,8 +5,6 @@
 #load "ProductSelectionDialog.csx"
 
 using System;
-using System.Configuration;
-using System.Web;
 
 using Microsoft.Bot.Builder.Azure;
 using Microsoft.Bot.Builder.Dialogs;
@@ -57,7 +55,7 @@ public class CustomerSalesDataDialog : IDialog<IMessageActivity>
 		if (products.SelectedProduct != null)
 		{
 			await context.PostAsync ($"Sure, I can help you with sales data for {Utils.ToTitleCase (products.SelectedProduct)}");
-            await Utils.SendTypingIndicator(context);
+
             await ProductSelected (context, new AwaitableFromItem<string> (products.SelectedProduct));
 		}
 		else if (products.Products.Count > 0) // if more than one is matched (e.g. "Tires"), go ahead and spin up a selection dialog
@@ -68,7 +66,7 @@ public class CustomerSalesDataDialog : IDialog<IMessageActivity>
 			}
 			else
 			{
-				await context.PostAsync ($"Your request matched too many products. Please try a more specific product name.");
+				await context.PostAsync ("Your request matched too many products. Please try a more specific product name.");
 				context.Fail (new Exception ("Too many products matched"));
 			}
 		}
@@ -82,9 +80,8 @@ public class CustomerSalesDataDialog : IDialog<IMessageActivity>
 	{
 		var message = await item;
 
-		if (message.Value != null)
+		if (message.Value != null) // adaptive cards postback with a message Value
 		{
-			// Got an Action Submit!
 			dynamic value = message.Value;
 
 			await processPostBackAction (context, value);
@@ -109,6 +106,9 @@ public class CustomerSalesDataDialog : IDialog<IMessageActivity>
 		{
 			case "MonthChange":
 				int selectedMonth = Convert.ToInt32 (value.Month);
+
+				await context.PostAsync ($"Ok, getting the data for {Utils.GetMonthName(selectedMonth)}");
+
 				await ShowCustomerSalesTotals (context, new AwaitableFromItem<int> (selectedMonth));
 				return;
 		}
@@ -205,8 +205,6 @@ public class CustomerSalesDataDialog : IDialog<IMessageActivity>
 	{
 		selectedProduct = await productResult;
 
-		//await context.PostAsync ("Getting that information now...");
-
 		// if the date range seems to be more than a 1 month span we need to ket the user know that's not supported
 		if (dateRange.Min.Month != dateRange.Max.AddSeconds(-1).Month)
 		{
@@ -222,37 +220,42 @@ public class CustomerSalesDataDialog : IDialog<IMessageActivity>
 	{
 		var selectedMonth = await result;
 
-		//await Utils.SendTypingIndicator (context);
+		// show typing indicator before we go get the SAP data
+		await Utils.SendTypingIndicator (context);
 
 		// get SAP data with parameterized query and return it
-		var data = await GetTopCustomerSalesForProduct (selectedProduct, selectedMonth, numberCustomers);
-
-		//await Utils.SendTypingIndicator (context);
-
-		// create our reply and add the sales card attachment
-		var replyMessage = context.MakeMessage ();
+		var data = await GetTopCustomerSalesForProduct (context, selectedProduct, selectedMonth, numberCustomers);
 
 		CardSupport? channelCardSupport = null;
 
-		replyMessage.Attachments = new List<Attachment> ();
+		var attachments = new List<Attachment> ();
 
 		ChannelCardSupport.TryGetValue (context.Activity.ChannelId, out channelCardSupport);
 
 		switch (channelCardSupport ?? CardSupport.Thumbnail)
 		{
 			case CardSupport.Adaptive:
-				replyMessage.Attachments.Add(getAdaptiveSalesCard (selectedProduct, numberCustomers, selectedMonth, data));
+
+				attachments.Add(getAdaptiveSalesCard (selectedProduct, numberCustomers, selectedMonth, data));
 				break;
 			case CardSupport.Thumbnail:
-				replyMessage.AttachmentLayout = AttachmentLayoutTypes.List;
 
 				var cards = getThumbnailSalesCard (selectedProduct, numberCustomers, selectedMonth, data);
 
 				foreach (var card in cards)
 				{
-					replyMessage.Attachments.Add (card);
+					attachments.Add (card);
 				}
 				break;
+		}
+
+		// create our reply and add the sales card attachment
+		var replyMessage = context.MakeMessage ();
+		replyMessage.Attachments = new List<Attachment> (attachments);
+
+		if (attachments.Count > 0)
+		{
+			replyMessage.AttachmentLayout = AttachmentLayoutTypes.List;
 		}
 
 		await context.PostAsync (replyMessage);
@@ -260,23 +263,14 @@ public class CustomerSalesDataDialog : IDialog<IMessageActivity>
 		context.Wait (MessageReceived);
 	}
 
-	private async Task<List<CustomerSales>> GetTopCustomerSalesForProduct (string product, int month, int numberCustomers = 5)
+	private async Task<List<CustomerSales>> GetTopCustomerSalesForProduct (IDialogContext context, string product, int month, int count = 5)
 	{
 		using (var client = new HttpClient ())
 		{
-			string functionSecret = ConfigurationManager.AppSettings ["TopCustomersForProductAPIKey"];
-
-			// anotherFunctionUri is another Azure Function's
-			// public URL, which should provide the secret code stored in app settings
-			// with key 'AnotherFunction_secret'
-			//Uri anotherFunctionUri = new Uri(req.RequestUri.AbsoluteUri.Replace(
-			//	req.RequestUri.PathAndQuery,
-			//	$"/api/AnotherFunction?code={anotherFunctionSecret}"));
-
-			var functionUri = $"https://sapbotdemo-2018.sapbotase.p.azurewebsites.net/api/TopCustomersForProduct?code={functionSecret}";
-			functionUri += $"&product={HttpUtility.UrlEncode (product)}";
-			functionUri += $"&month={month}";
-			functionUri += $"&count={numberCustomers}";
+			var functionUri = Utils.GetFunctionUrl (context, "TopCustomersForProduct", 
+				(nameof(product), product),
+				(nameof(month), month),
+				(nameof(count), count));
 
 			var response = await client.PostAsync (functionUri, null);
 
@@ -373,9 +367,6 @@ public class CustomerSalesDataDialog : IDialog<IMessageActivity>
 
 		foreach (var customerSalesData in salesData)
 		{
-			//List<CardImage> cardImages = new List<CardImage> ();
-			//cardImages.Add (new CardImage (url: cardContent.Value));
-
 			var card = new ThumbnailCard ()
 			{
 				Title = $"{customerSalesData.Customer}",

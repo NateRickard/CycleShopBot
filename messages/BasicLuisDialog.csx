@@ -20,7 +20,6 @@ public class BasicLuisDialog : LuisDialog<object>
 		ConfigurationManager.AppSettings ["LuisAPIKey"],
 		domain: ConfigurationManager.AppSettings ["LuisAPIHostName"])))
 	{
-
 	}
 
 	[LuisIntent ("None")]
