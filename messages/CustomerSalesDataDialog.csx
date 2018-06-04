@@ -30,7 +30,8 @@ public class CustomerSalesDataDialog : IDialog<IMessageActivity>
 	{
 		{ "emulator", CardSupport.Thumbnail },
 		{ "webchat", CardSupport.Adaptive },
-		{ "teams", CardSupport.Thumbnail }
+		{ "teams", CardSupport.Thumbnail },
+		{ "directline", CardSupport.Adaptive },
 	};
 
 	string selectedProduct;

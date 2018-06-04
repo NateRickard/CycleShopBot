@@ -63,6 +63,7 @@ public static async Task<object> Run(HttpRequestMessage req, TraceWriter log)
 					if (update.MembersAdded.Any ())
 					{
 						var reply = activity.CreateReply ();
+
 						var newMembers = update.MembersAdded?.Where (t => t.Id != activity.Recipient.Id);
 
 						foreach (var newMember in newMembers)
