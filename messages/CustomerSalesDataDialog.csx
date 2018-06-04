@@ -25,6 +25,9 @@ public class CustomerSalesDataDialog : IDialog<IMessageActivity>
 	const string Products = "Products";
 	const string DateRange = "builtin.datetimeV2.daterange";
 	const string Number = "builtin.number";
+	const string PrevMonth = "Prev Month";
+	const string NextMonth = "Next Month";
+	const string MonthChangeTemplate = "{{ \"Type\": \"MonthChange\", \"Month\": {0} }}";
 
 	static readonly Dictionary<string, CardSupport?> ChannelCardSupport = new Dictionary<string, CardSupport?> ()
 	{
@@ -36,6 +39,7 @@ public class CustomerSalesDataDialog : IDialog<IMessageActivity>
 
 	string selectedProduct;
 	int numberCustomers;
+	int selectedMonth;
 	(DateTime Min, DateTime Max, int StartIndex, int EndIndex) dateRange;
 
 	[NonSerialized]
@@ -87,9 +91,30 @@ public class CustomerSalesDataDialog : IDialog<IMessageActivity>
 
 			await processPostBackAction (context, value);
 		}
-		else if (message.Type == "message" && (message.Text?.StartsWith("{") ?? false)) // is this msg possibly json from a CardAction?
+		else if (message.Type == "message" && (message.Text?.StartsWith ("{") ?? false)) // is this msg possibly json from a CardAction?
 		{
 			dynamic value = JsonConvert.DeserializeObject<dynamic> (message.Text);
+
+			await processPostBackAction (context, value);
+		}
+		// some channels don't support these very well and just send back the button text
+		else if (message.Type == "message" && (message.Text == PrevMonth || message.Text == NextMonth))
+		{
+			string monthChangedEvent = null;
+
+			switch (message.Text)
+			{
+				case PrevMonth:
+					var monthPrior = selectedMonth == 1 ? 12 : selectedMonth - 1;
+					monthChangedEvent = string.Format (MonthChangeTemplate, monthPrior);
+					break;
+				case NextMonth:
+					var monthAfter = selectedMonth == 12 ? 1 : selectedMonth + 1;
+					monthChangedEvent = string.Format (MonthChangeTemplate, monthAfter);
+					break;
+			}
+
+			dynamic value = JsonConvert.DeserializeObject<dynamic> (monthChangedEvent);
 
 			await processPostBackAction (context, value);
 		}
@@ -219,7 +244,7 @@ public class CustomerSalesDataDialog : IDialog<IMessageActivity>
 
 	private async Task ShowCustomerSalesTotals (IDialogContext context, IAwaitable<int> result)
 	{
-		var selectedMonth = await result;
+		selectedMonth = await result;
 
 		// show typing indicator before we go get the SAP data
 		await Utils.SendTypingIndicator (context);
@@ -332,16 +357,16 @@ public class CustomerSalesDataDialog : IDialog<IMessageActivity>
 		card.Actions.Add (
 			new AdaptiveSubmitAction ()
 			{
-				Title = "Prev Month",
-				DataJson = $"{{ \"Type\": \"MonthChange\", \"Month\": {monthPrior} }}"
+				Title = PrevMonth,
+				DataJson = string.Format (MonthChangeTemplate, monthPrior)
 			}
 		);
 
 		card.Actions.Add (
 			new AdaptiveSubmitAction ()
 			{
-				Title = "Next Month",
-				DataJson = $"{{ \"Type\": \"MonthChange\", \"Month\": {monthAfter} }}"
+				Title = NextMonth,
+				DataJson = string.Format (MonthChangeTemplate, monthAfter)
 			}
 		);
 
@@ -382,18 +407,18 @@ public class CustomerSalesDataDialog : IDialog<IMessageActivity>
 
 		var prevButton = new CardAction ()
 		{
-			Value = $"{{ \"Type\": \"MonthChange\", \"Month\": {monthPrior} }}",
+			Value = string.Format (MonthChangeTemplate, monthPrior),
 			Type = "postBack",
-			Title = "Prev Month"
+			Title = PrevMonth
 		};
 
 		cardButtons.Add (prevButton);
 
 		var nextButton = new CardAction ()
 		{
-			Value = $"{{ \"Type\": \"MonthChange\", \"Month\": {monthAfter} }}",
+			Value = string.Format (MonthChangeTemplate, monthAfter),
 			Type = "postBack",
-			Title = "Next Month"
+			Title = NextMonth
 		};
 
 		cardButtons.Add (nextButton);
