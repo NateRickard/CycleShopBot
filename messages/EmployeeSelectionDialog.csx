@@ -33,6 +33,8 @@ public class EmployeeSelectionDialog : IDialog<string>
             3,
             PromptStyle.Auto,
             employees.Select(x => x.FullName));
+
+		await Task.Delay (0);
     }
 
     private async Task AfterMenuSelection(IDialogContext context, IAwaitable<string> result)

@@ -106,13 +106,15 @@ public class EmployeeDetails : IDialog<IMessageActivity>
     {
         string submitType = value.Type.ToString();
 
-        switch (submitType)
-        {
+        //switch (submitType)
+        //{
             //case "MonthChange":
             //    int selectedMonth = Convert.ToInt32(value.Month);
             //    await ShowCustomerSalesTotals(context, new AwaitableFromItem<int>(selectedMonth));
             //    return;
-        }
+        //}
+
+		await Task.Delay (0);
     }
 
 
