@@ -101,7 +101,7 @@ public class BasicLuisDialog : LuisDialog<object>
 
 		var replyMessage = context.MakeMessage ();
 		replyMessage.TextFormat = "markdown";
-		replyMessage.Text = $"Vest\nGloves\n\nTire\n\nWater Bottle\n\nSocks\n\nRoad Tire\n\nMountain Tire\n\nShorts\n\nTouring Tire\n\nJersey";
+		replyMessage.Text = $"Vest\n\nGloves\n\nTire\n\nWater Bottle\n\nSocks\n\nRoad Tire\n\nMountain Tire\n\nShorts\n\nTouring Tire\n\nJersey";
 
 		await context.PostAsync(replyMessage);
 		context.Wait (MessageReceived);
@@ -148,6 +148,15 @@ public class BasicLuisDialog : LuisDialog<object>
 
 		return Task.Delay (0);
 	}
+
+    [LuisIntent ("Context")]
+    public Task ContextIntent (IDialogContext context, IAwaitable<IMessageActivity> activity, LuisResult result)
+    {
+        var replyMessage = context.MakeMessage();
+        replyMessage.Text = $"ChannelID: {context.Activity.ChannelId}";
+        await context.PostAsync(replyMessage);
+        context.Wait(MessageReceived);
+    }
 
 	private async Task ShowFailedLuisIntentResult (IDialogContext context, LuisResult result)
 	{
