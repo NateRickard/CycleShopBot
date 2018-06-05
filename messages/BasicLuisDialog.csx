@@ -115,9 +115,9 @@ public class BasicLuisDialog : LuisDialog<object>
 		replyMessage.Text = $"Here's the current sales report for you!";
 		replyMessage.Attachments.Add(new Attachment()
 			{
-				ContentUrl = "https://sapcalwe64172.blob.core.windows.net/demofiles/CycleShopSales.pdf",
-				ContentType = "application/pdf",
-				Name = "CycleShopSales.pdf"
+				ContentUrl = "https://sapcalwe64172.blob.core.windows.net/demofiles/CycleShopSales.png",
+				ContentType = "image/png",
+				Name = "CycleShopSales.png"
 			});
 		await context.PostAsync(replyMessage);
 		context.Wait(MessageReceived);
