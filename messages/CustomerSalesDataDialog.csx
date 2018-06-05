@@ -32,7 +32,7 @@ public class CustomerSalesDataDialog : BotActionDialog<IMessageActivity>
 	{
 		{ "emulator", CardSupport.Adaptive },
 		{ "webchat", CardSupport.Adaptive },
-		{ "teams", CardSupport.Adaptive },
+		{ "msteams", CardSupport.Adaptive },
 		{ "directline", CardSupport.Adaptive },
 	};
 
