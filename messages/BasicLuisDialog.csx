@@ -112,19 +112,14 @@ public class BasicLuisDialog : LuisDialog<object>
 	public async Task SalesReportIntent(IDialogContext context, LuisResult result)
 	{
 		var replyMessage = context.MakeMessage();
-        if (context.Activity.ChannelId == "msteams")
+        
+        replyMessage.Text = $"Here's the current sales report for you!";
+        replyMessage.Attachments.Add(new Attachment()
         {
-            replyMessage.Text = "# Here's the current sales [report](https://sapcalwe64172.blob.core.windows.net/demofiles/CycleShopSales.png).";
-        } else
-        {
-            replyMessage.Text = $"Here's the current sales report for you!";
-            replyMessage.Attachments.Add(new Attachment()
-            {
-                ContentUrl = "https://sapcalwe64172.blob.core.windows.net/demofiles/CycleShopSales.png",
-                ContentType = "image/png",
-                Name = "CycleShopSales.png"
-            });
-        }
+            ContentUrl = "https://sapcalwe64172.blob.core.windows.net/demofiles/CycleShopSales.png",
+            ContentType = "image/png",
+            Name = "CycleShopSales.png"
+        });
        
 		await context.PostAsync(replyMessage);
 		context.Wait(MessageReceived);
