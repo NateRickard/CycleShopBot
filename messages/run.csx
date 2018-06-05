@@ -62,12 +62,15 @@ public static async Task<object> Run(HttpRequestMessage req, TraceWriter log)
 
 					if (update.MembersAdded.Any ())
 					{
-						var reply = activity.CreateReply ();
-						reply.Text = "Welcome";
+						var newMembers = update.MembersAdded?.Where (t => t.Id != activity.Recipient.Id);
 
-						await client.Conversations.ReplyToActivityAsync (reply);
+						if (newMembers.Any ())
+						{
+							var reply = activity.CreateReply ();
+							reply.Text = "Welcome";
 
-						//var newMembers = update.MembersAdded?.Where (t => t.Id != activity.Recipient.Id);
+							await client.Conversations.ReplyToActivityAsync (reply);
+						}
 
 						//foreach (var newMember in newMembers)
 						//{
