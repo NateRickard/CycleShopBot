@@ -63,22 +63,25 @@ public static async Task<object> Run(HttpRequestMessage req, TraceWriter log)
 					if (update.MembersAdded.Any ())
 					{
 						var reply = activity.CreateReply ();
+						reply.Text = "Welcome";
 
-						var newMembers = update.MembersAdded?.Where (t => t.Id != activity.Recipient.Id);
+						await client.Conversations.ReplyToActivityAsync (reply);
 
-						foreach (var newMember in newMembers)
-						{
-							reply.Text = "Welcome";
+						//var newMembers = update.MembersAdded?.Where (t => t.Id != activity.Recipient.Id);
 
-							if (!string.IsNullOrEmpty (newMember.Name))
-							{
-								reply.Text += $" {newMember.Name}";
-							}
+						//foreach (var newMember in newMembers)
+						//{
+						//	reply.Text = "Welcome";
 
-							reply.Text += "!";
+						//	if (!string.IsNullOrEmpty (newMember.Name))
+						//	{
+						//		reply.Text += $" {newMember.Name}";
+						//	}
 
-							await client.Conversations.ReplyToActivityAsync (reply);
-						}
+						//	reply.Text += "!";
+
+						//	await client.Conversations.ReplyToActivityAsync (reply);
+						//}
 					}
 					break;
 				case ActivityTypes.ContactRelationUpdate:

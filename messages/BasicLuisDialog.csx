@@ -70,6 +70,7 @@ public class BasicLuisDialog : LuisDialog<object>
                 new CardAction(){ Title = "Show Sample Queries", Type=ActionTypes.ImBack, Value="Show Samples" }
             }
         };
+
         await context.PostAsync(helpMessage);
 		context.Wait (MessageReceived);
 	}
@@ -97,9 +98,11 @@ public class BasicLuisDialog : LuisDialog<object>
 	public async Task ProductsIntent (IDialogContext context, LuisResult result)
 	{
 		await context.PostAsync ($"Here are some of the great products we sell.");
+
 		var replyMessage = context.MakeMessage ();
 		replyMessage.TextFormat = "markdown";
 		replyMessage.Text = $"Vest\nGloves\n\nTire\n\nWater Bottle\n\nSocks\n\nRoad Tire\n\nMountain Tire\n\nShorts\n\nTouring Tire\n\nJersey";
+
 		await context.PostAsync(replyMessage);
 		context.Wait (MessageReceived);
 	}
