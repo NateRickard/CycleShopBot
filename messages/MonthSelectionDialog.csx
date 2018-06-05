@@ -50,11 +50,18 @@ public class MonthSelectionDialog : IDialog<int>
 
 	private async Task AfterMenuSelection (IDialogContext context, IAwaitable<string> result)
 	{
-		var monthName = await result;
-		var selectedMonth = Utils.GetMonthNumber (monthName);
+		try
+		{
+			var monthName = await result;
+			var selectedMonth = Utils.GetMonthNumber (monthName);
 
-		await context.PostAsync ($"Great, I'll show you results for {monthName}");
+			await context.PostAsync ($"Great, I'll show you results for {monthName}");
 
-		context.Done (selectedMonth);
+			context.Done (selectedMonth);
+		}
+		catch (TooManyAttemptsException ex)
+		{
+			context.Fail (ex);
+		}
 	}
 }

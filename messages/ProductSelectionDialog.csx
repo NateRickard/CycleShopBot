@@ -39,10 +39,17 @@ public class ProductSelectionDialog : IDialog<string>
 
 	private async Task AfterMenuSelection (IDialogContext context, IAwaitable<string> result)
 	{
-		var productName = await result;
+		try
+		{
+			var productName = await result;
 
-		await context.PostAsync ($"Great, I'll show you results for {productName}");
+			await context.PostAsync ($"Great, I'll show you results for {productName}");
 
-		context.Done (productName);
+			context.Done (productName);
+		}
+		catch (TooManyAttemptsException ex)
+		{
+			context.Fail (ex);
+		}
 	}
 }

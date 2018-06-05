@@ -39,10 +39,17 @@ public class RegionSelectionDialog : IDialog<string>
             regions);
     }
 
-    private async Task AfterMenuSelection(IDialogContext context, IAwaitable<string> result)
-    {
-        var regionName = await result;
+	private async Task AfterMenuSelection (IDialogContext context, IAwaitable<string> result)
+	{
+		try
+		{
+			var regionName = await result;
 
-        context.Done(regionName);
-    }
+			context.Done (regionName);
+		}
+		catch (TooManyAttemptsException ex)
+		{
+			context.Fail (ex);
+		}
+	}
 }
