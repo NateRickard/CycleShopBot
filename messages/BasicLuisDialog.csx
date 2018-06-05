@@ -112,16 +112,24 @@ public class BasicLuisDialog : LuisDialog<object>
 	public async Task SalesReportIntent(IDialogContext context, LuisResult result)
 	{
 		var replyMessage = context.MakeMessage();
-		replyMessage.Text = $"Here's the current sales report for you!";
-		replyMessage.Attachments.Add(new Attachment()
-			{
-				ContentUrl = "https://sapcalwe64172.blob.core.windows.net/demofiles/CycleShopSales.png",
-				ContentType = "image/png",
-				Name = "CycleShopSales.png"
-			});
+        if (context.Activity.ChannelId == "teams")
+        {
+            replyMessage.Text = "# Here's the current sales [report](https://sapcalwe64172.blob.core.windows.net/demofiles/CycleShopSales.png).";
+        } else
+        {
+            replyMessage.Text = $"Here's the current sales report for you!";
+            replyMessage.Attachments.Add(new Attachment()
+            {
+                ContentUrl = "https://sapcalwe64172.blob.core.windows.net/demofiles/CycleShopSales.png",
+                ContentType = "image/png",
+                Name = "CycleShopSales.png"
+            });
+        }
+       
 		await context.PostAsync(replyMessage);
 		context.Wait(MessageReceived);
-	}
+
+    }
 
     [LuisIntent("Regions")]
     public async Task RegionsIntent(IDialogContext context, LuisResult result)
