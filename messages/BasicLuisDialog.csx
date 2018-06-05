@@ -117,7 +117,7 @@ public class BasicLuisDialog : LuisDialog<object>
 			{
 				ContentUrl = "https://sapcalwe64172.blob.core.windows.net/demofiles/CycleShopSales.pdf",
 				ContentType = "image/png",
-				NameValueFileSectionHandler = "CycleShopSales.pdf"
+				Name = "CycleShopSales.pdf"
 			});
 		await context.PostAsync(replyMessage);
 		context.Wait(MessageReceived);
