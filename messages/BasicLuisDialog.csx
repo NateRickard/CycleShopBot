@@ -112,7 +112,7 @@ public class BasicLuisDialog : LuisDialog<object>
 	public async Task SalesReportIntent(IDialogContext context, LuisResult result)
 	{
 		var replyMessage = context.MakeMessage();
-        if (context.Activity.ChannelId == "teams")
+        if (context.Activity.ChannelId == "msteams")
         {
             replyMessage.Text = "# Here's the current sales [report](https://sapcalwe64172.blob.core.windows.net/demofiles/CycleShopSales.png).";
         } else
