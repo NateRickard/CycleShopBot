@@ -116,7 +116,7 @@ public class BasicLuisDialog : LuisDialog<object>
 		replyMessage.Attachments.Add(new Attachment()
 			{
 				ContentUrl = "https://sapcalwe64172.blob.core.windows.net/demofiles/CycleShopSales.pdf",
-				ContentType = "image/png",
+				ContentType = "application/pdf",
 				Name = "CycleShopSales.pdf"
 			});
 		await context.PostAsync(replyMessage);
