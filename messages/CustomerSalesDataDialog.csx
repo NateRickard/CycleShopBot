@@ -1,6 +1,8 @@
 ﻿#load "Utils.csx"
+#load "BotActionDialog.csx"
 #load "DecimalConverter.csx"
 #load "CustomerSales.csx"
+#load "LuisEntities.csx"
 #load "MonthSelectionDialog.csx"
 #load "ProductSelectionDialog.csx"
 
@@ -17,21 +19,18 @@ using Newtonsoft.Json;
 using AdaptiveCards;
 
 [Serializable]
-public class CustomerSalesDataDialog : IDialog<IMessageActivity>
+public class CustomerSalesDataDialog : BotActionDialog<IMessageActivity>
 {
 	const int DefaultNumberCustomers = 5;
 	const int TooManyProductsLimit = 10;
 
-	const string Products = "Products";
-	const string DateRange = "builtin.datetimeV2.daterange";
-	const string Number = "builtin.number";
 	const string PrevMonth = "Prev Month";
 	const string NextMonth = "Next Month";
 	const string MonthChangeTemplate = "{{ \"Type\": \"MonthChange\", \"Month\": {0} }}";
 
 	static readonly Dictionary<string, CardSupport?> ChannelCardSupport = new Dictionary<string, CardSupport?> ()
 	{
-		{ "emulator", CardSupport.Thumbnail },
+		{ "emulator", CardSupport.Adaptive },
 		{ "webchat", CardSupport.Adaptive },
 		{ "teams", CardSupport.Thumbnail },
 		{ "directline", CardSupport.Adaptive },
@@ -50,7 +49,7 @@ public class CustomerSalesDataDialog : IDialog<IMessageActivity>
 		this.luisResult = luisResult;
 	}
 
-	public async Task StartAsync (IDialogContext context)
+	public async override Task StartAsync (IDialogContext context)
 	{
 		var products = findProducts (luisResult);
 		dateRange = getDateRanges (luisResult);
@@ -61,7 +60,7 @@ public class CustomerSalesDataDialog : IDialog<IMessageActivity>
 		{
 			await context.PostAsync ($"Sure, I can help you with sales data for {Utils.ToTitleCase (products.SelectedProduct)}");
 
-            await ProductSelected (context, new AwaitableFromItem<string> (products.SelectedProduct));
+			await ProductSelected (context, new AwaitableFromItem<string> (products.SelectedProduct));
 		}
 		else if (products.Products.Count > 0) // if more than one is matched (e.g. "Tires"), go ahead and spin up a selection dialog
 		{
@@ -77,54 +76,31 @@ public class CustomerSalesDataDialog : IDialog<IMessageActivity>
 		}
 		else
 		{
-			context.Fail (new Exception("Too many products matched"));
+			context.Fail (new Exception ("Too many products matched"));
 		}
 	}
 
-	protected virtual async Task MessageReceived (IDialogContext context, IAwaitable<IMessageActivity> item)
+	protected override bool IsCommand (string message)
 	{
-		var message = await item;
-
-		if (message.Value != null) // adaptive cards postback with a message Value
-		{
-			dynamic value = message.Value;
-
-			await processPostBackAction (context, value);
-		}
-		else if (message.Type == "message" && (message.Text?.StartsWith ("{") ?? false)) // is this msg possibly json from a CardAction?
-		{
-			dynamic value = JsonConvert.DeserializeObject<dynamic> (message.Text);
-
-			await processPostBackAction (context, value);
-		}
-		// some channels don't support these very well and just send back the button text
-		else if (message.Type == "message" && (message.Text == PrevMonth || message.Text == NextMonth))
-		{
-			string monthChangedEvent = null;
-
-			switch (message.Text)
-			{
-				case PrevMonth:
-					var monthPrior = selectedMonth == 1 ? 12 : selectedMonth - 1;
-					monthChangedEvent = string.Format (MonthChangeTemplate, monthPrior);
-					break;
-				case NextMonth:
-					var monthAfter = selectedMonth == 12 ? 1 : selectedMonth + 1;
-					monthChangedEvent = string.Format (MonthChangeTemplate, monthAfter);
-					break;
-			}
-
-			dynamic value = JsonConvert.DeserializeObject<dynamic> (monthChangedEvent);
-
-			await processPostBackAction (context, value);
-		}
-		else //exit this dialog if we don't understand/handle what's coming in
-		{
-			context.Done (message);
-		}
+		return message == PrevMonth || message == NextMonth;
 	}
 
-	private async Task processPostBackAction (IDialogContext context, dynamic value)
+	protected override string GenerateCommandEvent (string message)
+	{
+		switch (message)
+		{
+			case PrevMonth:
+				var monthPrior = selectedMonth == 1 ? 12 : selectedMonth - 1;
+				return string.Format (MonthChangeTemplate, monthPrior);
+			case NextMonth:
+				var monthAfter = selectedMonth == 12 ? 1 : selectedMonth + 1;
+				return string.Format (MonthChangeTemplate, monthAfter);
+		}
+
+		return base.GenerateCommandEvent (message);
+	}
+
+	protected async override Task ProcessPostBackAction (IDialogContext context, dynamic value)
 	{
 		string submitType = value.Type.ToString ();
 
@@ -133,7 +109,7 @@ public class CustomerSalesDataDialog : IDialog<IMessageActivity>
 			case "MonthChange":
 				int selectedMonth = Convert.ToInt32 (value.Month);
 
-				await context.PostAsync ($"Ok, getting the data for {Utils.GetMonthName(selectedMonth)}");
+				await context.PostAsync ($"Ok, getting the data for {Utils.GetMonthName (selectedMonth)}");
 
 				await ShowCustomerSalesTotals (context, new AwaitableFromItem<int> (selectedMonth));
 				return;
@@ -144,7 +120,7 @@ public class CustomerSalesDataDialog : IDialog<IMessageActivity>
 	{
 		string product = null;
 		var products = new List<string> ();
-		var allProductEntities = result.Entities?.Where (e => e.Type == Products).ToList () ?? new List<EntityRecommendation> ();
+		var allProductEntities = result.Entities?.Where (e => e.Type == LuisEntities.Products).ToList () ?? new List<EntityRecommendation> ();
 
 		// identify a single product entity, if possible; otherwise we'll let the user select
 		foreach (var entity in allProductEntities)
@@ -154,7 +130,7 @@ public class CustomerSalesDataDialog : IDialog<IMessageActivity>
 				var productSynonyms = (values as List<object>).Where (v => v is string).Select (v => v as string).ToList ();
 
 				// if we have an exact match, this is the entity we want
-				if (productSynonyms.Count == 1 && entity.Entity.ToLower ().Contains(productSynonyms [0].ToLower ())) //TODO: do we need this 2nd condition??
+				if (productSynonyms.Count == 1 && entity.Entity.ToLower ().Contains (productSynonyms [0].ToLower ())) //TODO: do we need this 2nd condition??
 				{
 					// in this case, the actual product name should be passed in as the synonym or they should be equal
 					//	e.g. "Touring Tires" will return "Touring Tire" as the synonym, when using "Touring Tire" they will be equal
@@ -184,7 +160,7 @@ public class CustomerSalesDataDialog : IDialog<IMessageActivity>
 		int dateStartIndex = -1;
 		int dateEndIndex = -1;
 
-		if (result.TryFindEntity (DateRange, out EntityRecommendation dateRangeEntity))
+		if (result.TryFindEntity (LuisEntities.BuiltIn.DateRange.Identifier, out EntityRecommendation dateRangeEntity))
 		{
 			dateStartIndex = dateRangeEntity.StartIndex ?? -1;
 			dateEndIndex = dateRangeEntity.EndIndex ?? -1;
@@ -193,7 +169,7 @@ public class CustomerSalesDataDialog : IDialog<IMessageActivity>
 			{
 				//get all values in this list and find the first one that's a date range.. there may be separate years represented, etc.
 				var ranges = (values as List<object>).Where (v => v is Dictionary<string, object>).Select (v => v as Dictionary<string, object>);
-				var range = ranges.FirstOrDefault (v => v.ContainsValue ("daterange"));
+				var range = ranges.FirstOrDefault (v => v.ContainsValue (LuisEntities.BuiltIn.DateRange.Name));
 
 				if (range != null)
 				{
@@ -208,7 +184,7 @@ public class CustomerSalesDataDialog : IDialog<IMessageActivity>
 
 	private int getNumberCustomers (LuisResult result)
 	{
-		var numberEntities = result.Entities?.Where (e => e.Type == Number).ToList () ?? new List<EntityRecommendation> ();
+		var numberEntities = result.Entities?.Where (e => e.Type == LuisEntities.BuiltIn.Number).ToList () ?? new List<EntityRecommendation> ();
 
 		while (numberEntities.Count > 0)
 		{
@@ -229,16 +205,23 @@ public class CustomerSalesDataDialog : IDialog<IMessageActivity>
 
 	private async Task ProductSelected (IDialogContext context, IAwaitable<string> productResult)
 	{
-		selectedProduct = await productResult;
+		try
+		{
+			selectedProduct = await productResult;
 
-		// if the date range seems to be more than a 1 month span we need to ket the user know that's not supported
-		if (dateRange.Min.Month != dateRange.Max.AddSeconds(-1).Month)
-		{
-			context.Call (new MonthSelectionDialog (dateRange.Min, dateRange.Max), ShowCustomerSalesTotals);
+			// if the date range seems to be more than a 1 month span we need to ket the user know that's not supported
+			if (dateRange.Min.Month != dateRange.Max.AddSeconds (-1).Month)
+			{
+				context.Call (new MonthSelectionDialog (dateRange.Min, dateRange.Max), ShowCustomerSalesTotals);
+			}
+			else
+			{
+				await ShowCustomerSalesTotals (context, new AwaitableFromItem<int> (dateRange.Min.Month));
+			}
 		}
-		else
+		catch (Exception ex)
 		{
-			await ShowCustomerSalesTotals (context, new AwaitableFromItem<int> (dateRange.Min.Month));
+			context.Fail (ex);
 		}
 	}
 
@@ -262,7 +245,7 @@ public class CustomerSalesDataDialog : IDialog<IMessageActivity>
 		{
 			case CardSupport.Adaptive:
 
-				attachments.Add(getAdaptiveSalesCard (selectedProduct, numberCustomers, selectedMonth, data));
+				attachments.Add (getAdaptiveSalesCard (selectedProduct, numberCustomers, selectedMonth, data));
 				break;
 			case CardSupport.Thumbnail:
 
@@ -293,10 +276,10 @@ public class CustomerSalesDataDialog : IDialog<IMessageActivity>
 	{
 		using (var client = new HttpClient ())
 		{
-			var functionUri = Utils.GetFunctionUrl (context, "TopCustomersForProduct", 
-				(nameof(product), product),
-				(nameof(month), month),
-				(nameof(count), count));
+			var functionUri = Utils.GetFunctionUrl (context, "TopCustomersForProduct",
+				(nameof (product), product),
+				(nameof (month), month),
+				(nameof (count), count));
 
 			var response = await client.PostAsync (functionUri, null);
 

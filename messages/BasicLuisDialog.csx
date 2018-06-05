@@ -143,7 +143,7 @@ public class BasicLuisDialog : LuisDialog<object>
 
 	private async Task ShowFailedLuisIntentResult (IDialogContext context, LuisResult result)
 	{
-		await context.PostAsync ($"I couldn't decide what you wanted me to do based on that request. Try again with a bit more information and please be patient with me as I continue to learn.");
+		await context.PostAsync ($"I couldn't decide what to do based on that input. Try again with a bit more information and please be patient with me as I continue to learn.");
 		await context.PostAsync ($"Try typing 'help' to see the queries I'm able to respond to.");
 
 		context.Wait (MessageReceived);
@@ -152,17 +152,25 @@ public class BasicLuisDialog : LuisDialog<object>
 	// This function is called after each dialog process is done
 	private async Task ResumeAfterDialog (IDialogContext context, IAwaitable<object> result)
 	{
-		var dialogResult = await result;
+		try
+		{
+			var dialogResult = await result;
 
-		// fall back to this dialog handling something if a child dialog doesn't understand - e.g. if the user repeats the query that started a CustomerSalesDataDialog
-		if (dialogResult is IMessageActivity)
-		{
-			await MessageReceived (context, new AwaitableFromItem<IMessageActivity> (dialogResult as IMessageActivity));
+			// fall back to this dialog handling something if a child dialog doesn't understand - e.g. if the user repeats the query that started a CustomerSalesDataDialog
+			if (dialogResult is IMessageActivity)
+			{
+				await MessageReceived (context, new AwaitableFromItem<IMessageActivity> (dialogResult as IMessageActivity));
+			}
+			else // not a msg, but we'll return control to this dialog
+			{
+				// MessageRecieved function will receive users' messages
+				context.Wait (MessageReceived);
+			}
 		}
-		else // not a msg, but we'll return control to this dialog
+		catch
 		{
-			// MessageRecieved function will receive users' messages
-			context.Wait (MessageReceived);
+			// an error occurred in the child dialog
+			await ShowFailedLuisIntentResult (context, null);
 		}
 	}
 }
