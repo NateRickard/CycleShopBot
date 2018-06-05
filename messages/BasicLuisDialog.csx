@@ -150,7 +150,7 @@ public class BasicLuisDialog : LuisDialog<object>
 	}
 
     [LuisIntent ("Context")]
-    public Task ContextIntent (IDialogContext context, IAwaitable<IMessageActivity> activity, LuisResult result)
+    public async Task ContextIntent (IDialogContext context, IAwaitable<IMessageActivity> activity, LuisResult result)
     {
         var replyMessage = context.MakeMessage();
         replyMessage.Text = $"ChannelID: {context.Activity.ChannelId}";
