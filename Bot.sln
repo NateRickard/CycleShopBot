@@ -27,6 +27,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "messages", "messages", "{F4D9DF3B-F4E4-4E19-9053-3AF71A3189FA}"
 	ProjectSection(SolutionItems) = preProject
 		messages\BasicLuisDialog.csx = messages\BasicLuisDialog.csx
+		messages\BotActionDialog.csx = messages\BotActionDialog.csx
 		messages\CustomerSales.csx = messages\CustomerSales.csx
 		messages\CustomerSalesDataDialog.csx = messages\CustomerSalesDataDialog.csx
 		messages\DecimalConverter.csx = messages\DecimalConverter.csx
@@ -36,6 +37,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "messages", "messages", "{F4
 		messages\EmployeeList.csx = messages\EmployeeList.csx
 		messages\EmployeeSelectionDialog.csx = messages\EmployeeSelectionDialog.csx
 		messages\function.json = messages\function.json
+		messages\LuisEntities.csx = messages\LuisEntities.csx
 		messages\MonthSelectionDialog.csx = messages\MonthSelectionDialog.csx
 		messages\ProductSelectionDialog.csx = messages\ProductSelectionDialog.csx
 		messages\project.json = messages\project.json
