@@ -34,6 +34,7 @@ public class CustomerSalesDataDialog : BotActionDialog<IMessageActivity>
 		{ "webchat", CardSupport.Adaptive },
 		{ "msteams", CardSupport.Adaptive },
 		{ "directline", CardSupport.Adaptive },
+		{ "skype", CardSupport.Adaptive }
 	};
 
 	string selectedProduct;
