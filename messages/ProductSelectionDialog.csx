@@ -24,14 +24,14 @@ public class ProductSelectionDialog : IDialog<string>
 
 	private async Task showProductPrompt (IDialogContext context)
 	{
-		await context.PostAsync ("I found more than one matching product. Choose a product to continue.");
+		await context.PostAsync ("I found more than one matching product.");
 
 		PromptDialog.Choice<string> (
 			context,
 			AfterMenuSelection,
 			products,
 			"Which product would you like to view sales data for?",
-			"Ooops, what you wrote is not a valid product, please try again",
+			"Try entering a valid product next time! ;)",
 			3,
 			PromptStyle.Auto,
 			products);
