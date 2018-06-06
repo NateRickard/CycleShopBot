@@ -37,7 +37,8 @@ public class CustomerSalesDataDialog : BotActionDialog<IMessageActivity>
 		{ "emulator", CardSupport.Adaptive },
 		{ "webchat", CardSupport.Adaptive },
 		{ "msteams", CardSupport.Adaptive },
-		{ "directline", CardSupport.Adaptive }
+		{ "directline", CardSupport.Adaptive },
+		{ "skype", CardSupport.Adaptive }
 	};
 
 	public static BotAction MonthChange = BotAction.Define ("MonthChange", "Month");

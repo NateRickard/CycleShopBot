@@ -22,10 +22,10 @@ public class EmployeeCard : AdaptiveCard
             Text = employee.Title
         });
 
-        // Add text to the card.
+
         this.Body.Add(new AdaptiveTextBlock()
         {
-            Text = $"Vacation: {employee.VacationHours}"
+            Text = $"Vacation: {employee.VacationHours} hours"
         });
 
         // Add buttons to the card.
@@ -35,17 +35,17 @@ public class EmployeeCard : AdaptiveCard
             Title = $"Email {employee.FirstName}"
         });
 
-        this.Actions.Add(new AdaptiveOpenUrlAction()
-        {
-            Url = new Uri("tel:{employee.Phone}"),
-            Title = $"Call {employee.FirstName}"
-        });
+        //this.Actions.Add(new AdaptiveOpenUrlAction()
+        //{
+        //    Url = new Uri("tel:{employee.Phone}"),
+        //    Title = $"Call {employee.FirstName}"
+        //});
 
-        this.Actions.Add(new AdaptiveOpenUrlAction()
-        {
-            Url = new Uri($"sms:{employee.Phone}"),
-            Title = $"Text {employee.FirstName}"
-        });
+        //this.Actions.Add(new AdaptiveOpenUrlAction()
+        //{
+        //    Url = new Uri($"sms:{employee.Phone}"),
+        //    Title = $"Text {employee.FirstName}"
+        //});
     }
      
 } 

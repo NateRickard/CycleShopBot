@@ -24,8 +24,7 @@ public class MonthSelectionDialog : IDialog<int>
 
 	private async Task showMonthPrompt (IDialogContext context, DateTime dateRangeMin, DateTime dateRangeMax)
 	{
-		await context.PostAsync ($"It looks like you asked for that sales between {dateRangeMin.ToShortDateString ()} and {dateRangeMax.ToShortDateString ()}");
-		await context.PostAsync ($"I can only return sales data for a single month currently.");
+		await context.PostAsync ($"I'll need you to select the month as well.");
 
 		var monthOptions = new List<string> ();
 
@@ -42,7 +41,7 @@ public class MonthSelectionDialog : IDialog<int>
 			AfterMenuSelection,
 			monthOptions,
 			"Which month would you like to view sales data for?",
-			"Ooops, what you wrote is not a valid month, please try again",
+			"I'll need you to give me a valid month.",
 			3,
 			PromptStyle.Auto,
 			monthOptions);
