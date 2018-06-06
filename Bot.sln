@@ -27,6 +27,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "messages", "messages", "{F4D9DF3B-F4E4-4E19-9053-3AF71A3189FA}"
 	ProjectSection(SolutionItems) = preProject
 		messages\BasicLuisDialog.csx = messages\BasicLuisDialog.csx
+		messages\BotAction.csx = messages\BotAction.csx
 		messages\BotActionDialog.csx = messages\BotActionDialog.csx
 		messages\CustomerSales.csx = messages\CustomerSales.csx
 		messages\CustomerSalesDataDialog.csx = messages\CustomerSalesDataDialog.csx

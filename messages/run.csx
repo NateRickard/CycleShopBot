@@ -46,7 +46,6 @@ public static async Task<object> Run(HttpRequestMessage req, TraceWriter log)
         {
             return BotAuthenticator.GenerateUnauthorizedResponse(req);
         }
-    
 
         if (activity != null)
         {

@@ -24,18 +24,6 @@ public class CustomerSalesDataDialog : BotActionDialog<IMessageActivity>
 	const int DefaultNumberCustomers = 5;
 	const int TooManyProductsLimit = 10;
 
-	const string PrevMonth = "Prev Month";
-	const string NextMonth = "Next Month";
-	const string MonthChangeTemplate = "{{ \"Type\": \"MonthChange\", \"Month\": {0} }}";
-
-	static readonly Dictionary<string, CardSupport?> ChannelCardSupport = new Dictionary<string, CardSupport?> ()
-	{
-		{ "emulator", CardSupport.Adaptive },
-		{ "webchat", CardSupport.Adaptive },
-		{ "msteams", CardSupport.Adaptive },
-		{ "directline", CardSupport.Adaptive },
-	};
-
 	string selectedProduct;
 	int numberCustomers;
 	int selectedMonth;
@@ -44,9 +32,28 @@ public class CustomerSalesDataDialog : BotActionDialog<IMessageActivity>
 	[NonSerialized]
 	LuisResult luisResult;
 
+	static readonly Dictionary<string, CardSupport?> ChannelCardSupport = new Dictionary<string, CardSupport?> ()
+	{
+		{ "emulator", CardSupport.Adaptive },
+		{ "webchat", CardSupport.Adaptive },
+		{ "msteams", CardSupport.Adaptive },
+		{ "directline", CardSupport.Adaptive }
+	};
+
+	public static BotAction MonthChange = BotAction.Define ("MonthChange", "Month");
+	public static Command<int, int> PrevMonth = Command.Define ("Prev Month", MonthChange, (int month) => month == 1 ? 12 : month - 1);
+	public static Command<int, int> NextMonth = Command.Define ("Next Month", MonthChange, (int month) => month == 12 ? 1 : month + 1);
+
 	public CustomerSalesDataDialog (LuisResult luisResult)
 	{
 		this.luisResult = luisResult;
+	}
+
+	protected override string RenderCommandEventForLabel (string label)
+	{
+		return PrevMonth.IsCommandLabel (label) ? PrevMonth.RenderActionEvent(selectedMonth) 
+			: NextMonth.IsCommandLabel (label) ? NextMonth.RenderActionEvent(selectedMonth) 
+			: null;
 	}
 
 	public async override Task StartAsync (IDialogContext context)
@@ -80,39 +87,17 @@ public class CustomerSalesDataDialog : BotActionDialog<IMessageActivity>
 		}
 	}
 
-	protected override bool IsCommand (string message)
-	{
-		return message == PrevMonth || message == NextMonth;
-	}
-
-	protected override string GenerateCommandEvent (string message)
-	{
-		switch (message)
-		{
-			case PrevMonth:
-				var monthPrior = selectedMonth == 1 ? 12 : selectedMonth - 1;
-				return string.Format (MonthChangeTemplate, monthPrior);
-			case NextMonth:
-				var monthAfter = selectedMonth == 12 ? 1 : selectedMonth + 1;
-				return string.Format (MonthChangeTemplate, monthAfter);
-		}
-
-		return base.GenerateCommandEvent (message);
-	}
-
 	protected async override Task ProcessPostBackAction (IDialogContext context, dynamic value)
 	{
 		string submitType = value.Type.ToString ();
 
-		switch (submitType)
+		if (MonthChange.IsInstance (submitType))
 		{
-			case "MonthChange":
-				int selectedMonth = Convert.ToInt32 (value.Month);
+			int selectedMonth = Convert.ToInt32 (value.Month);
 
-				await context.PostAsync ($"Ok, getting the data for {Utils.GetMonthName (selectedMonth)}");
+			await context.PostAsync ($"Ok, getting the data for {Utils.GetMonthName (selectedMonth)}");
 
-				await ShowCustomerSalesTotals (context, new AwaitableFromItem<int> (selectedMonth));
-				return;
+			await ShowCustomerSalesTotals (context, new AwaitableFromItem<int> (selectedMonth));
 		}
 	}
 
@@ -311,9 +296,6 @@ public class CustomerSalesDataDialog : BotActionDialog<IMessageActivity>
 			facts.Add (new AdaptiveFact (customerSalesData.Customer, String.Format ("{0:C}", customerSalesData.TotalSales)));
 		}
 
-		var monthPrior = month == 1 ? 12 : month - 1;
-		var monthAfter = month == 12 ? 1 : month + 1;
-
 		AdaptiveCard card = new AdaptiveCard ()
 		{
 			Body =
@@ -340,16 +322,16 @@ public class CustomerSalesDataDialog : BotActionDialog<IMessageActivity>
 		card.Actions.Add (
 			new AdaptiveSubmitAction ()
 			{
-				Title = PrevMonth,
-				DataJson = string.Format (MonthChangeTemplate, monthPrior)
+				Title = PrevMonth.Label,
+				DataJson = PrevMonth.RenderActionEvent (selectedMonth)
 			}
 		);
 
 		card.Actions.Add (
 			new AdaptiveSubmitAction ()
 			{
-				Title = NextMonth,
-				DataJson = string.Format (MonthChangeTemplate, monthAfter)
+				Title = NextMonth.Label,
+				DataJson = NextMonth.RenderActionEvent (selectedMonth)
 			}
 		);
 
@@ -390,18 +372,18 @@ public class CustomerSalesDataDialog : BotActionDialog<IMessageActivity>
 
 		var prevButton = new CardAction ()
 		{
-			Value = string.Format (MonthChangeTemplate, monthPrior),
+			Value = PrevMonth.RenderActionEvent (selectedMonth),
 			Type = "postBack",
-			Title = PrevMonth
+			Title = PrevMonth.Label
 		};
 
 		cardButtons.Add (prevButton);
 
 		var nextButton = new CardAction ()
 		{
-			Value = string.Format (MonthChangeTemplate, monthAfter),
+			Value = NextMonth.RenderActionEvent (selectedMonth),
 			Type = "postBack",
-			Title = NextMonth
+			Title = NextMonth.Label
 		};
 
 		cardButtons.Add (nextButton);
