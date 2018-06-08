@@ -1,77 +1,17 @@
 ﻿using System;
 using System.Text;
 
-public class Command
-{
-	public string Label { get; protected set; }
-
-	public BotAction Action { get; set; }
-
-	public bool IsCommandLabel (string label)
-	{
-		return this.Label == label;
-	}
-
-	public static Command<TIn, TOut> Define<TIn, TOut> (string label, BotAction action, Func<TIn, TOut> dataFactory)
-	{
-		return new Command<TIn, TOut>
-		(
-			label,
-			action,
-			dataFactory
-		);
-	}
-}
-
-[Serializable]
-public class Command<TIn, TOut> : Command
-{
-	public Func<TIn, TOut> DataFactory { get; protected set; }
-
-	public Command (string label, BotAction action, Func<TIn, TOut> dataFactory)
-	{
-		Label = label;
-		Action = action;
-		DataFactory = dataFactory;
-	}
-
-	//public static Command Define (string label)
-	//{
-	//	return new Command
-	//	{
-	//		Label = label
-	//	};
-	//}
-
-
-	public Command<TIn, TOut> WithAction (BotAction action, Func<TIn, TOut> dataFactory)
-	{
-		this.Action = action;
-		this.DataFactory = dataFactory;
-
-		return this;
-	}
-
-	
-
-	public string RenderActionEvent (TIn arg)
-	{
-		if (DataFactory != null)
-		{
-			var data = DataFactory (arg);
-
-			return Action.RenderActionEvent (data);
-		}
-
-		return Action.EventTemplate; // no data members needed
-	}
-}
-
 [Serializable]
 public class BotAction
 {
+	/// <summary>
+	/// The type or name of event to be triggered and handled.
+	/// </summary>
 	public string Type { get; set; }
 
+	/// <summary>
+	/// a JSON template describing the action. This is generated based on the BotAction you define and used to post back to the bot.
+	/// </summary>
 	public string EventTemplate { get; private set; }
 
 	private BotAction ()
@@ -106,13 +46,18 @@ public class BotAction
 		};
 	}
 
-	public bool IsInstance (string type)
+	/// <summary>
+	/// Returns a value indicating if the Type of this BotAction matches the type passed in.
+	/// </summary>
+	/// <param name="eventType"></param>
+	/// <returns></returns>
+	public bool IsTriggeredBy (string eventType)
 	{
-		return Type == type;
+		return Type == eventType;
 	}
 
 	/// <summary>
-	/// Renders the action event JSON with the given dataMembers used to format the event template.
+	/// Renders the JSON for the event to be triggered.
 	/// </summary>
 	/// <param name="dataMembers"></param>
 	/// <returns></returns>
@@ -121,5 +66,15 @@ public class BotAction
 		var formattedMembers = dataMembers.Select (d => d is string ? string.Format ("\"{0}\"", d) : d).ToArray ();
 
 		return string.Format (EventTemplate, formattedMembers);
+	}
+
+	/// <summary>
+	/// Returns a value indicating if the given text appears to be an event template.
+	/// </summary>
+	/// <param name="text"></param>
+	/// <returns></returns>
+	public static bool IsActionEvent (string text)
+	{
+		return text?.StartsWith ("{ \"Type\":") ?? false;
 	}
 }

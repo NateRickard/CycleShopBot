@@ -41,20 +41,16 @@ public class CustomerSalesDataDialog : BotActionDialog<IMessageActivity>
 		{ "skype", CardSupport.Adaptive }
 	};
 
-	public static BotAction MonthChange = BotAction.Define ("MonthChange", "Month");
-	public static Command<int, int> PrevMonth = Command.Define ("Prev Month", MonthChange, (int month) => month == 1 ? 12 : month - 1);
-	public static Command<int, int> NextMonth = Command.Define ("Next Month", MonthChange, (int month) => month == 12 ? 1 : month + 1);
+	static BotAction MonthChange = BotAction.Define ("MonthChange", "Month");
+	Command<int> PrevMonth;
+	Command<int> NextMonth;
 
 	public CustomerSalesDataDialog (LuisResult luisResult)
 	{
 		this.luisResult = luisResult;
-	}
 
-	protected override string RenderCommandEventForLabel (string label)
-	{
-		return PrevMonth.IsCommandLabel (label) ? PrevMonth.RenderActionEvent(selectedMonth) 
-			: NextMonth.IsCommandLabel (label) ? NextMonth.RenderActionEvent(selectedMonth) 
-			: null;
+		PrevMonth = DefineCommand<int> ("Prev Month", MonthChange, () => selectedMonth == 1 ? 12 : selectedMonth - 1);
+		NextMonth = DefineCommand<int> ("Next Month", MonthChange, () => selectedMonth == 12 ? 1 : selectedMonth + 1);
 	}
 
 	public async override Task StartAsync (IDialogContext context)
@@ -92,7 +88,7 @@ public class CustomerSalesDataDialog : BotActionDialog<IMessageActivity>
 	{
 		string submitType = value.Type.ToString ();
 
-		if (MonthChange.IsInstance (submitType))
+		if (MonthChange.IsTriggeredBy (submitType))
 		{
 			int selectedMonth = Convert.ToInt32 (value.Month);
 
@@ -324,7 +320,7 @@ public class CustomerSalesDataDialog : BotActionDialog<IMessageActivity>
 			new AdaptiveSubmitAction ()
 			{
 				Title = PrevMonth.Label,
-				DataJson = PrevMonth.RenderActionEvent (selectedMonth)
+				DataJson = PrevMonth.RenderActionEvent ()
 			}
 		);
 
@@ -332,7 +328,7 @@ public class CustomerSalesDataDialog : BotActionDialog<IMessageActivity>
 			new AdaptiveSubmitAction ()
 			{
 				Title = NextMonth.Label,
-				DataJson = NextMonth.RenderActionEvent (selectedMonth)
+				DataJson = NextMonth.RenderActionEvent ()
 			}
 		);
 
@@ -354,9 +350,6 @@ public class CustomerSalesDataDialog : BotActionDialog<IMessageActivity>
 
 		attachments.Add (titleCard.ToAttachment ());
 
-		var monthPrior = month == 1 ? 12 : month - 1;
-		var monthAfter = month == 12 ? 1 : month + 1;
-
 		foreach (var customerSalesData in salesData)
 		{
 			var card = new ThumbnailCard ()
@@ -373,7 +366,7 @@ public class CustomerSalesDataDialog : BotActionDialog<IMessageActivity>
 
 		var prevButton = new CardAction ()
 		{
-			Value = PrevMonth.RenderActionEvent (selectedMonth),
+			Value = PrevMonth.RenderActionEvent (),
 			Type = "postBack",
 			Title = PrevMonth.Label
 		};
@@ -382,7 +375,7 @@ public class CustomerSalesDataDialog : BotActionDialog<IMessageActivity>
 
 		var nextButton = new CardAction ()
 		{
-			Value = NextMonth.RenderActionEvent (selectedMonth),
+			Value = NextMonth.RenderActionEvent (),
 			Type = "postBack",
 			Title = NextMonth.Label
 		};

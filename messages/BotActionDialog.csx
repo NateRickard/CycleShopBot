@@ -1,4 +1,5 @@
 ﻿#load "BotAction.csx"
+#load "Command.csx"
 
 using System;
 using System.Linq;
@@ -8,9 +9,42 @@ using Microsoft.Bot.Connector;
 
 using Newtonsoft.Json;
 
+/// <summary>
+/// A base Dialog class used when your bot needs to handle postback events from Adaptive Cards, other cards, and entered message text.
+/// </summary>
+/// <typeparam name="TResult">The type that this Dialog returns.</typeparam>
 [Serializable]
 public abstract class BotActionDialog<TResult> : IDialog<TResult>
 {
+	List<Command> Commands = new List<Command> ();
+
+	protected Command DefineCommand (string label, BotAction action)
+	{
+		var cmd = Command.Define (label, action);
+
+		Commands.Add (cmd);
+
+		return cmd;
+	}
+
+	protected Command<TOut> DefineCommand<TOut> (string label, BotAction action, Func<TOut> dataFactory)
+	{
+		var cmd = Command.Define (label, action, dataFactory);
+
+		Commands.Add (cmd);
+
+		return cmd;
+	}
+
+	protected Command<TIn, TOut> DefineCommand<TIn, TOut> (string label, BotAction action, Func<TIn, TOut> dataFactory)
+	{
+		var cmd = Command.Define (label, action, dataFactory);
+
+		Commands.Add (cmd);
+
+		return cmd;
+	}
+
 	public async virtual Task StartAsync (IDialogContext context)
 	{
 		await Task.Delay (0);
@@ -26,7 +60,7 @@ public abstract class BotActionDialog<TResult> : IDialog<TResult>
 
 			await ProcessPostBackAction (context, value);
 		}
-		else if (message.Type == ActivityTypes.Message && (message.Text?.StartsWith ("{") ?? false)) // is this msg possibly json from a CardAction?
+		else if (message.Type == ActivityTypes.Message && BotAction.IsActionEvent (message.Text)) // is this msg possibly json from a CardAction?
 		{
 			dynamic value = JsonConvert.DeserializeObject<dynamic> (message.Text);
 
@@ -36,10 +70,12 @@ public abstract class BotActionDialog<TResult> : IDialog<TResult>
 		else if (message.Type == ActivityTypes.Message)
 		{
 			// is this a command the current dialog has defined??
-			var eventJson = RenderCommandEventForLabel (message.Text);
+			var cmd = Commands.FirstOrDefault (c => c.IsCommandLabel (message.Text));
 
-			if (eventJson != null)
+			if (cmd != null)
 			{
+				var eventJson = cmd.RenderActionEvent ();
+
 				dynamic value = JsonConvert.DeserializeObject<dynamic> (eventJson);
 
 				await ProcessPostBackAction (context, value);
@@ -53,11 +89,6 @@ public abstract class BotActionDialog<TResult> : IDialog<TResult>
 		{
 			context.Done (message);
 		}
-	}
-
-	protected virtual string RenderCommandEventForLabel (string label)
-	{
-		return null;
 	}
 
 	protected async virtual Task ProcessPostBackAction (IDialogContext context, dynamic value)
