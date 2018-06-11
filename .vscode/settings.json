@@ -1,6 +1,0 @@
-{
-  "azureFunctions.projectRuntime": "~1",
-  "azureFunctions.projectLanguage": "C#",
-  "azureFunctions.templateFilter": "Verified",
-  "azureFunctions.deploySubpath": "bin/Debug/net461"
-}

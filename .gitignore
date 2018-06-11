@@ -4,11 +4,13 @@
 # User-specific files
 *.suo
 *.user
+*.userosscache
 *.sln.docstates
 *.userprefs
 project.lock.json
 local.settings.json
 .vs/
+.vscode/
 
 # Xamarin.Android
 Resource.designer.cs
