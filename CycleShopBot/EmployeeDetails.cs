@@ -13,84 +13,93 @@ using Newtonsoft.Json.Converters;
 
 namespace CycleShopBot
 {
-    [Serializable]
-    public class EmployeeDetails : BotActionDialog<IMessageActivity>
-    {
-        int selectedEmployeeID = 0;
+	[Serializable]
+	public class EmployeeDetails : BotActionDialog<IMessageActivity>
+	{
+		int selectedEmployeeID = 0;
 
-        public EmployeeDetails(LuisResult luisResult)
-        {
-            selectedEmployeeID = findEmployee(luisResult);
-        }
+		static readonly HttpClient Client = new HttpClient ();
 
-        public override async Task StartAsync(IDialogContext context)
-        {
-            var data = await GetEmployeeDetails(context, selectedEmployeeID);
+		public EmployeeDetails (LuisResult luisResult)
+		{
+			selectedEmployeeID = findEmployee (luisResult);
+		}
 
-            await DisplayEmployeeCard(context, data);
-        }
+		public override async Task StartAsync (IDialogContext context)
+		{
+			var data = await GetEmployeeDetails (context, selectedEmployeeID);
 
-        private int findEmployee(LuisResult result)
-        {
-            string employeeId = "0";
-            var regions = new List<string>();
-            var allEmployeeEntities = result.Entities?.Where(e => e.Type == LuisEntities.BuiltIn.Number).ToList() ?? new List<EntityRecommendation>();
+			await DisplayEmployeeCard (context, data);
+		}
 
-            // identify a single region entity
-            foreach (var entity in allEmployeeEntities)
-            {
-                if (entity.Resolution != null && entity.Resolution.TryGetValue("value", out object values))
-                {
-                    employeeId = values.ToString();
-                }
-            }
+		private int findEmployee (LuisResult result)
+		{
+			string employeeId = "0";
+			var regions = new List<string> ();
+			var allEmployeeEntities = result.Entities?.Where (e => e.Type == LuisEntities.BuiltIn.Number).ToList () ?? new List<EntityRecommendation> ();
 
-            return int.Parse(employeeId);
-        }
+			// identify a single region entity
+			foreach (var entity in allEmployeeEntities)
+			{
+				if (entity.Resolution != null && entity.Resolution.TryGetValue ("value", out object values))
+				{
+					employeeId = values.ToString ();
+				}
+			}
 
-        private async Task DisplayEmployeeCard(IDialogContext context, EmployeeItem employee)
-        {
-            await Utils.SendTypingIndicator(context);
+			return int.Parse (employeeId);
+		}
 
-            var replyToConversation = context.MakeMessage();
-            replyToConversation.Attachments = new List<Attachment>();
+		private async Task DisplayEmployeeCard (IDialogContext context, EmployeeItem employee)
+		{
+			await context.SendTypingIndicator ();
 
-            AdaptiveCard card = new EmployeeCard(employee);
+			var replyToConversation = context.MakeMessage ();
+			replyToConversation.Attachments = new List<Attachment> ();
 
-            replyToConversation.Attachments.Add(new Attachment() { ContentType = AdaptiveCard.ContentType, Content = card });
-            await context.PostAsync(replyToConversation);
-            context.Wait(MessageReceived);
-        }
+			AdaptiveCard card = new EmployeeCard (employee);
 
-        private async Task<EmployeeItem> GetEmployeeDetails(IDialogContext context, int employeeid)
-        {
-            using (var client = new HttpClient())
-            {
-                var functionUri = Utils.GetFunctionUrl(context, "EmployeeDetails",
-                    (nameof(employeeid), employeeid));
+			replyToConversation.Attachments.Add (new Attachment () { ContentType = AdaptiveCard.ContentType, Content = card });
+			await context.PostAsync (replyToConversation);
+			context.Wait (MessageReceived);
+		}
 
-                var response = await client.PostAsync(functionUri, null);
+		private async Task<EmployeeItem> GetEmployeeDetails (IDialogContext context, int employeeid)
+		{
+			try
+			{
+				var functionUri = context.GetFunctionUrl ("EmployeeDetails",
+					(nameof (employeeid), employeeid));
 
-                using (HttpContent content = response.Content)
-                {
-                    // read the response as a string
-                    var jsonRaw = await content.ReadAsStringAsync();
-                    // clean up nasty formatted json
-                    var json = jsonRaw.Trim('"').Replace(@"\", string.Empty);
+				var response = await Client.PostAsync (functionUri, null);
 
-                    var data = JsonConvert.DeserializeObject<List<EmployeeItem>>(json, Settings);
-                    return data[0];
-                }
-            }
-        }
+				using (HttpContent content = response.Content)
+				{
+					// read the response as a string
+					var jsonRaw = await content.ReadAsStringAsync ();
+					// clean up nasty formatted json
+					var json = jsonRaw.Trim ('"').Replace (@"\", string.Empty);
 
-        public static readonly JsonSerializerSettings Settings = new JsonSerializerSettings
-        {
-            MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
-            DateParseHandling = DateParseHandling.None,
-            Converters = {
-                new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal }
-            },
-        };
-    }
+					var data = JsonConvert.DeserializeObject<List<EmployeeItem>> (json, Settings);
+					return data [0];
+				}
+			}
+			catch
+			{
+				await context.PostAsync ("There was an issue retrieving the data you requested.");
+				await context.PostAsync ("Please try your request again.");
+
+				throw Exceptions.DataException;
+			}
+		}
+
+		public static readonly JsonSerializerSettings Settings = new JsonSerializerSettings
+		{
+			MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
+			DateParseHandling = DateParseHandling.None,
+			Converters = {
+				new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal }
+			},
+		};
+	}
 }

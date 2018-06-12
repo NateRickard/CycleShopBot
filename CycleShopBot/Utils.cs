@@ -9,55 +9,57 @@ using Microsoft.Bot.Connector;
 
 namespace CycleShopBot
 {
-    public static class Utils
-    {
-        public static string GetMonthName(int month)
-        {
-            return CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(month);
-        }
+	public static class Utils
+	{
+		static TextInfo TextInfo = new CultureInfo ("en-US", false).TextInfo;
 
-        public static int GetMonthNumber(string monthName)
-        {
-            return Convert.ToDateTime("01-" + monthName + "-2018").Month;
-        }
+		public static string GetMonthName (int month)
+		{
+			return CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName (month);
+		}
 
-        public static string ToTitleCase(string str)
-        {
-            TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
+		public static int GetMonthNumber (string monthName)
+		{
+			return Convert.ToDateTime ("01-" + monthName + "-2018").Month;
+		}
 
-            return textInfo.ToTitleCase(str);
-        }
+		public static string ToTitleCase (this string str)
+		{
+			return TextInfo.ToTitleCase (str);
+		}
 
-        public static async Task SendTypingIndicator(IDialogContext context)
-        {
-            //Send typing indicator
-            var typingIndicator = context.MakeMessage();
-            typingIndicator.Type = ActivityTypes.Typing;
-            await context.PostAsync(typingIndicator);
-        }
+		public static async Task SendTypingIndicator (this IDialogContext context)
+		{
+			//Send typing indicator
+			var typingIndicator = context.MakeMessage ();
+			typingIndicator.Type = ActivityTypes.Typing;
+			await context.PostAsync (typingIndicator);
+		}
 
-        public static string GetFunctionUrl(IDialogContext context, string functionName, params (string Name, object Value)[] args)
-        {
-            string functionSecret = ConfigurationManager.AppSettings[$"{functionName}APIKey"];
+		public static string GetFunctionUrl (this IDialogContext context, string functionName, params (string Name, object Value) [] args)
+		{
+			string functionSecret = ConfigurationManager.AppSettings [$"{functionName}APIKey"];
 
-            //context.PostAsync ("baseUrl url is:" + BaseFunctionUrl);
+			//context.PostAsync ("baseUrl url is:" + BaseFunctionUrl);
 
-            if (CycleShopBot.BaseFunctionUrl.Contains("localhost")) //can't hit SAP locally so we need to hit the prod functions here
-            {
-                CycleShopBot.BaseFunctionUrl = ConfigurationManager.AppSettings["DefaultFunctionUrl"];
-            }
+			var localFunctionsEnabled = Convert.ToBoolean (ConfigurationManager.AppSettings ["LocalDataFunctions"] ?? "false");
 
-            var functionUrl = $"{CycleShopBot.BaseFunctionUrl}/api/{functionName}?code={functionSecret}";
+			if (!localFunctionsEnabled && CycleShopBot.BaseFunctionUrl.Contains ("localhost")) //can't hit SAP locally so we need to hit the prod functions here
+			{
+				CycleShopBot.BaseFunctionUrl = ConfigurationManager.AppSettings ["DefaultFunctionUrl"];
+			}
 
-            if (args != null)
-            {
-                foreach (var arg in args)
-                {
-                    functionUrl += $"&{arg.Name}={HttpUtility.UrlEncode(arg.Value.ToString())}";
-                }
-            }
+			var functionUrl = $"{CycleShopBot.BaseFunctionUrl}/api/{functionName}?code={functionSecret}";
 
-            return functionUrl;
-        }
-    }
+			if (args != null)
+			{
+				foreach (var arg in args)
+				{
+					functionUrl += $"&{arg.Name}={HttpUtility.UrlEncode (arg.Value.ToString ())}";
+				}
+			}
+
+			return functionUrl;
+		}
+	}
 }

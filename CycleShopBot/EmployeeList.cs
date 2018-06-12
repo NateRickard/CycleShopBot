@@ -13,152 +13,168 @@ using Newtonsoft.Json.Converters;
 
 namespace CycleShopBot
 {
-    [Serializable]
-    public class EmployeeList : BotActionDialog<IMessageActivity>
-    {
-        string selectedRegion = null;
-        string selectedEmployeeID = null;
-        List<EmployeeItem> employees;
+	[Serializable]
+	public class EmployeeList : BotActionDialog<IMessageActivity>
+	{
+		string selectedRegion = null;
+		string selectedEmployeeID = null;
+		List<EmployeeItem> employees;
 
-        [NonSerialized]
-        LuisResult luisResult;
+		[NonSerialized]
+		readonly LuisResult luisResult;
 
-        public EmployeeList(LuisResult luisResult)
-        {
-            this.luisResult = luisResult;
-        }
+		static readonly HttpClient Client = new HttpClient ();
 
-        public async override Task StartAsync(IDialogContext context)
-        {
-            var regionCode = findRegion(luisResult);
+		public EmployeeList (LuisResult luisResult)
+		{
+			this.luisResult = luisResult;
+		}
 
-            // try to find an exact product match
-            if (regionCode > 0)
-            {
-                await DisplayEmployeeList(context, regionCode, "None");
-            }
-            else
-            {
-                context.Call(new RegionSelectionDialog(), RegionSelected);
-            }
-        }
+		public async override Task StartAsync (IDialogContext context)
+		{
+			var regionCode = findRegion (luisResult);
 
-        private async Task RegionSelected(IDialogContext context, IAwaitable<string> regionResult)
-        {
-            try
-            {
-                selectedRegion = await regionResult;
+			// try to find an exact product match
+			if (regionCode > 0)
+			{
+				await DisplayEmployeeList (context, regionCode, "None");
+			}
+			else
+			{
+				context.Call (new RegionSelectionDialog (), RegionSelected);
+			}
+		}
 
-                await DisplayEmployeeList(context, 0, selectedRegion);
-            }
-            catch (Exception ex)
-            {
-                context.Fail(ex);
-            }
-        }
+		private async Task RegionSelected (IDialogContext context, IAwaitable<string> regionResult)
+		{
+			try
+			{
+				selectedRegion = await regionResult;
 
-        private async Task EmployeeSelected(IDialogContext context, IAwaitable<string> employeeResult)
-        {
-            try
-            {
-                selectedEmployeeID = await employeeResult;
+				await DisplayEmployeeList (context, 0, selectedRegion);
+			}
+			catch (Exception ex)
+			{
+				context.Fail (ex);
+			}
+		}
 
-                await DisplayEmployeeCard(context, selectedEmployeeID);
-            }
-            catch (Exception ex)
-            {
-                context.Fail(ex);
-            }
-        }
+		private async Task EmployeeSelected (IDialogContext context, IAwaitable<string> employeeResult)
+		{
+			try
+			{
+				selectedEmployeeID = await employeeResult;
 
-        /// <summary>
-        /// Must have either regionCode or region supplied.
-        /// </summary>
-        /// <param name="context"></param>
-        /// <param name="regionCode"></param>
-        /// <param name="region"></param>
-        /// <returns></returns>
-        private async Task DisplayEmployeeList(IDialogContext context, int regionCode, string region)
-        {
-            await Utils.SendTypingIndicator(context);
-            employees = await GetEmployeeListForRegion(context, regionCode, region);
+				await DisplayEmployeeCard (context, selectedEmployeeID);
+			}
+			catch (Exception ex)
+			{
+				context.Fail (ex);
+			}
+		}
 
-            if (employees.Count > 0)
-            {
-                context.Call(new EmployeeSelectionDialog(employees), EmployeeSelected);
-            }
-        }
+		/// <summary>
+		/// Must have either regionCode or region supplied.
+		/// </summary>
+		/// <param name="context"></param>
+		/// <param name="regionCode"></param>
+		/// <param name="region"></param>
+		/// <returns></returns>
+		private async Task DisplayEmployeeList (IDialogContext context, int regionCode, string region)
+		{
+			await context.SendTypingIndicator ();
 
-        private async Task DisplayEmployeeCard(IDialogContext context, string employeeId)
-        {
-            await Utils.SendTypingIndicator(context);
+			employees = await GetEmployeeListForRegion (context, regionCode, region);
 
-            var employee = employees.Where(x => x.EmployeeKey == long.Parse(employeeId)).First();
+			if (employees.Count > 0)
+			{
+				context.Call (new EmployeeSelectionDialog (employees), EmployeeSelected);
+			}
+		}
 
-            var replyToConversation = context.MakeMessage();
-            replyToConversation.Attachments = new List<Attachment>();
+		private async Task DisplayEmployeeCard (IDialogContext context, string employeeId)
+		{
+			await context.SendTypingIndicator ();
 
-            AdaptiveCard card = new EmployeeCard(employee);
+			var employee = employees.Where (x => x.EmployeeKey == long.Parse (employeeId)).First ();
 
-            replyToConversation.Attachments.Add(new Attachment() { ContentType = AdaptiveCard.ContentType, Content = card });
-            await context.PostAsync(replyToConversation);
-            context.Wait(MessageReceived);
-        }
+			var replyToConversation = context.MakeMessage ();
+			replyToConversation.Attachments = new List<Attachment> ();
 
-        private async Task<List<EmployeeItem>> GetEmployeeListForRegion(IDialogContext context, int regionCode, string region)
-        {
-            using (var client = new HttpClient())
-            {
-                var functionUri = Utils.GetFunctionUrl(context, "SalesPeopleInRegion",
-                    (nameof(regionCode), regionCode),
-                    (nameof(region), region));
+			var card = new EmployeeCard (employee);
 
-                var response = await client.PostAsync(functionUri, null);
+			replyToConversation.Attachments.Add (new Attachment ()
+			{
+				ContentType = AdaptiveCard.ContentType,
+				Content = card
+			});
 
-                using (HttpContent content = response.Content)
-                {
-                    // read the response as a string
-                    var jsonRaw = await content.ReadAsStringAsync();
-                    // clean up nasty formatted json
-                    var json = jsonRaw.Trim('"').Replace(@"\", string.Empty);
+			await context.PostAsync (replyToConversation);
 
-                    return JsonConvert.DeserializeObject<List<EmployeeItem>>(json, Settings);
-                }
-            }
-        }
+			context.Wait (MessageReceived);
+		}
 
-        public static readonly JsonSerializerSettings Settings = new JsonSerializerSettings
-        {
-            MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
-            DateParseHandling = DateParseHandling.None,
-            Converters = {
-                new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal }
-            },
-        };
+		private async Task<List<EmployeeItem>> GetEmployeeListForRegion (IDialogContext context, int regionCode, string region)
+		{
+			try
+			{
+				var functionUri = context.GetFunctionUrl ("SalesPeopleInRegion",
+						(nameof (regionCode), regionCode),
+						(nameof (region), region));
 
-        private int findRegion(LuisResult result)
-        {
-            string region = "0";
-            var regions = new List<string>();
-            var allRegionEntities = result.Entities?.Where(e => e.Type == LuisEntities.Regions).ToList() ?? new List<EntityRecommendation>();
+				var response = await Client.PostAsync (functionUri, null);
 
-            // identify a single region entity
-            foreach (var entity in allRegionEntities)
-            {
-                if (entity.Resolution != null && entity.Resolution.TryGetValue("values", out object values))
-                {
-                    var regionSynonyms = (values as List<object>).Where(v => v is string).Select(v => v as string).ToList();
+				using (HttpContent content = response.Content)
+				{
+					// read the response as a string
+					var jsonRaw = await content.ReadAsStringAsync ();
+					// clean up nasty formatted json
+					var json = jsonRaw.Trim ('"').Replace (@"\", string.Empty);
 
-                    // if we have an exact match, this is the entity we want
-                    if (regionSynonyms.Count == 1)
-                    {
-                        region = regionSynonyms[0];
-                        break;
-                    }
-                }
-            }
+					return JsonConvert.DeserializeObject<List<EmployeeItem>> (json, Settings);
+				}
+			}
+			catch
+			{
+				await context.PostAsync ("There was an issue retrieving the data you requested.");
+				await context.PostAsync ("Please try your request again.");
 
-            return int.Parse(region);
-        }
-    }
+				throw Exceptions.DataException;
+			}
+		}
+
+		static readonly JsonSerializerSettings Settings = new JsonSerializerSettings
+		{
+			MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
+			DateParseHandling = DateParseHandling.None,
+			Converters = {
+				new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal }
+			},
+		};
+
+		private int findRegion (LuisResult result)
+		{
+			string region = "0";
+			var regions = new List<string> ();
+			var allRegionEntities = result.Entities?.Where (e => e.Type == LuisEntities.Regions).ToList () ?? new List<EntityRecommendation> ();
+
+			// identify a single region entity
+			foreach (var entity in allRegionEntities)
+			{
+				if (entity.Resolution != null && entity.Resolution.TryGetValue ("values", out object values))
+				{
+					var regionSynonyms = (values as List<object>).Where (v => v is string).Select (v => v as string).ToList ();
+
+					// if we have an exact match, this is the entity we want
+					if (regionSynonyms.Count == 1)
+					{
+						region = regionSynonyms [0];
+						break;
+					}
+				}
+			}
+
+			return int.Parse (region);
+		}
+	}
 }

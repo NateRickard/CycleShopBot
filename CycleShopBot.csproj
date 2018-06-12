@@ -1,6 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
+    <Company>Microsoft</Company>
+    <Authors>Nate Rickard</Authors>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="CycleShopBot\bin\**" />
