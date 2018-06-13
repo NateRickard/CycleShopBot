@@ -50,7 +50,7 @@ namespace CycleShopBot
 					switch (activity.GetActivityType ())
 					{
 						case ActivityTypes.Message:
-							await Conversation.SendAsync (activity, () => new BasicLuisDialog ());
+							await Conversation.SendAsync (activity, () => new CycleShopLuisDialog ());
 							break;
 						case ActivityTypes.ConversationUpdate:
 							var client = new ConnectorClient (new Uri (activity.ServiceUrl));

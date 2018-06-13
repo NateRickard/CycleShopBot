@@ -10,9 +10,9 @@ using Microsoft.Bot.Connector;
 namespace CycleShopBot
 {
 	[Serializable]
-	public class BasicLuisDialog : LuisDialog<object>
+	public class CycleShopLuisDialog : LuisDialog<object>
 	{
-		public BasicLuisDialog () : base (new LuisService (new LuisModelAttribute (
+		public CycleShopLuisDialog () : base (new LuisService (new LuisModelAttribute (
 			ConfigurationManager.AppSettings ["LuisAppId"],
 			ConfigurationManager.AppSettings ["LuisAPIKey"],
 			domain: ConfigurationManager.AppSettings ["LuisAPIHostName"])))
