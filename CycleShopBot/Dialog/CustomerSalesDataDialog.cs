@@ -1,14 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
-using AdaptiveCards;
+﻿using CycleShopBot.Cards;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Luis;
 using Microsoft.Bot.Builder.Luis.Models;
 using Microsoft.Bot.Connector;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace CycleShopBot
 {
@@ -28,6 +29,8 @@ namespace CycleShopBot
 
 		static readonly HttpClient Client = new HttpClient ();
 
+		static readonly bool MockDataEnabled = Convert.ToBoolean (ConfigurationManager.AppSettings ["MockData"] ?? "false");
+
 		static readonly Dictionary<string, CardSupport?> ChannelCardSupport = new Dictionary<string, CardSupport?> ()
 		{
 			{ "emulator", CardSupport.Adaptive },
@@ -38,22 +41,22 @@ namespace CycleShopBot
 		};
 
 		static BotAction MonthChange = BotAction.Define ("MonthChange", "Month");
-		Command<int> PrevMonth;
-		Command<int> NextMonth;
+		readonly Command<int> PrevMonth;
+		readonly Command<int> NextMonth;
 
 		public CustomerSalesDataDialog (LuisResult luisResult)
 		{
 			this.luisResult = luisResult;
 
-			PrevMonth = DefineCommand<int> ("Prev Month", MonthChange, () => selectedMonth == 1 ? 12 : selectedMonth - 1);
-			NextMonth = DefineCommand<int> ("Next Month", MonthChange, () => selectedMonth == 12 ? 1 : selectedMonth + 1);
+			PrevMonth = DefineCommand ("Prev Month", MonthChange, () => selectedMonth == 1 ? 12 : selectedMonth - 1);
+			NextMonth = DefineCommand ("Next Month", MonthChange, () => selectedMonth == 12 ? 1 : selectedMonth + 1);
 		}
 
 		public async override Task StartAsync (IDialogContext context)
 		{
-			var products = findProducts (luisResult);
-			dateRange = getDateRanges (luisResult);
-			numberCustomers = getNumberCustomers (luisResult);
+			var products = FindProducts (luisResult);
+			dateRange = GetDateRanges (luisResult);
+			numberCustomers = GetNumberCustomers (luisResult);
 
 			// try to find an exact product match
 			if (products.SelectedProduct != null)
@@ -94,7 +97,7 @@ namespace CycleShopBot
 			}
 		}
 
-		private (string SelectedProduct, List<string> Products) findProducts (LuisResult result)
+		private (string SelectedProduct, List<string> Products) FindProducts (LuisResult result)
 		{
 			string product = null;
 			var products = new List<string> ();
@@ -129,7 +132,7 @@ namespace CycleShopBot
 			return (product, products);
 		}
 
-		private (DateTime Min, DateTime Max, int StartIndex, int EndIndex) getDateRanges (LuisResult result)
+		private (DateTime Min, DateTime Max, int StartIndex, int EndIndex) GetDateRanges (LuisResult result)
 		{
 			DateTime now = DateTime.Now;
 			// default to the current month
@@ -160,7 +163,7 @@ namespace CycleShopBot
 			return (dateRangeMin, dateRangeMax, dateStartIndex, dateEndIndex);
 		}
 
-		private int getNumberCustomers (LuisResult result)
+		private int GetNumberCustomers (LuisResult result)
 		{
 			var numberEntities = result.Entities?.Where (e => e.Type == LuisEntities.BuiltIn.Number).ToList () ?? new List<EntityRecommendation> ();
 
@@ -221,20 +224,19 @@ namespace CycleShopBot
 			{
 				case CardSupport.Adaptive:
 
-					attachments.Add (GetAdaptiveSalesCard (selectedProduct, numberCustomers, selectedMonth, data));
+					var card = new AdaptiveSalesCard (selectedProduct, numberCustomers, selectedMonth, data, PrevMonth, NextMonth);
+					attachments.Add (card.AsAttachment ());
+
 					break;
 				case CardSupport.Thumbnail:
 
-					var cards = GetThumbnailSalesCard (selectedProduct, numberCustomers, selectedMonth, data);
+					var cardList = new ThumbnailSalesCardList (selectedProduct, numberCustomers, selectedMonth, data, PrevMonth, NextMonth);
+					attachments.AddRange (cardList.AsAttachmentList ());
 
-					foreach (var card in cards)
-					{
-						attachments.Add (card);
-					}
 					break;
 			}
 
-			// create our reply and add the sales card attachment
+			// create our reply and add the sales card attachment(s)
 			var replyMessage = context.MakeMessage ();
 			replyMessage.Attachments = new List<Attachment> (attachments);
 
@@ -243,6 +245,7 @@ namespace CycleShopBot
 				replyMessage.AttachmentLayout = AttachmentLayoutTypes.List;
 			}
 
+			// send it
 			await context.PostAsync (replyMessage);
 
 			context.Wait (MessageReceived);
@@ -252,28 +255,35 @@ namespace CycleShopBot
 		{
 			try
 			{
-				var functionUri = context.GetFunctionUrl ("TopCustomersForProduct",
+				if (!MockDataEnabled)
+				{
+					var functionUri = context.GetFunctionUrl ("TopCustomersForProduct",
 						(nameof (product), product),
 						(nameof (month), month),
 						(nameof (count), count));
 
-				var response = await Client.PostAsync (functionUri, null);
+					var response = await Client.PostAsync (functionUri, null);
 
-				using (HttpContent content = response.Content)
-				{
-					// read the response as a string
-					var jsonRaw = await content.ReadAsStringAsync ();
-					// clean up nasty formatted json
-					var json = jsonRaw.Trim ('"').Replace (@"\", string.Empty);
-
-					// settings to properly handle our scientific notation formatted decimal values
-					var settings = new JsonSerializerSettings
+					using (HttpContent content = response.Content)
 					{
-						FloatParseHandling = FloatParseHandling.Decimal,
-						Converters = new List<JsonConverter> { new DecimalConverter () }
-					};
+						// read the response as a string
+						var jsonRaw = await content.ReadAsStringAsync ();
+						// clean up nasty formatted json
+						var json = jsonRaw.Trim ('"').Replace (@"\", string.Empty);
 
-					return JsonConvert.DeserializeObject<List<CustomerSales>> (json, settings);
+						// settings to properly handle our scientific notation formatted decimal values
+						var settings = new JsonSerializerSettings
+						{
+							FloatParseHandling = FloatParseHandling.Decimal,
+							Converters = new List<JsonConverter> { new DecimalConverter () }
+						};
+
+						return JsonConvert.DeserializeObject<List<CustomerSales>> (json, settings);
+					}
+				}
+				else
+				{
+					return MockData.CustomerSales;
 				}
 			}
 			catch
@@ -283,114 +293,6 @@ namespace CycleShopBot
 
 				throw Exceptions.DataException;
 			}
-		}
-
-		private Attachment GetAdaptiveSalesCard (string product, int numberCustomers, int month, List<CustomerSales> salesData)
-		{
-			var facts = new List<AdaptiveFact> ();
-
-			foreach (var customerSalesData in salesData)
-			{
-				facts.Add (new AdaptiveFact (customerSalesData.Customer, String.Format ("{0:C}", customerSalesData.TotalSales)));
-			}
-
-			AdaptiveCard card = new AdaptiveCard ()
-			{
-				Body =
-			{
-				new AdaptiveContainer()
-				{
-					Items =
-					{
-						new AdaptiveTextBlock()
-						{
-							Text = $"{Utils.GetMonthName(month)} - {product.ToTitleCase()}",
-							Size = AdaptiveTextSize.ExtraLarge,
-							Weight = AdaptiveTextWeight.Bolder
-						},
-						new AdaptiveFactSet()
-						{
-							Facts = facts
-						}
-					}
-				}
-			}
-			};
-
-			card.Actions.Add (
-				new AdaptiveSubmitAction ()
-				{
-					Title = PrevMonth.Label,
-					DataJson = PrevMonth.RenderActionEvent ()
-				}
-			);
-
-			card.Actions.Add (
-				new AdaptiveSubmitAction ()
-				{
-					Title = NextMonth.Label,
-					DataJson = NextMonth.RenderActionEvent ()
-				}
-			);
-
-			return new Attachment ()
-			{
-				ContentType = AdaptiveCard.ContentType,
-				Content = card
-			};
-		}
-
-		private List<Attachment> GetThumbnailSalesCard (string product, int numberCustomers, int month, List<CustomerSales> salesData)
-		{
-			var attachments = new List<Attachment> ();
-
-			var titleCard = new ThumbnailCard ()
-			{
-				Title = $"{Utils.GetMonthName (month)} - {product.ToTitleCase ()}"
-			};
-
-			attachments.Add (titleCard.ToAttachment ());
-
-			foreach (var customerSalesData in salesData)
-			{
-				var card = new ThumbnailCard ()
-				{
-					Title = $"{customerSalesData.Customer}",
-					Subtitle = $"{customerSalesData.TotalSales:C}"
-				};
-
-				var attachment = card.ToAttachment ();
-				attachments.Add (attachment);
-			}
-
-			var cardButtons = new List<CardAction> ();
-
-			var prevButton = new CardAction ()
-			{
-				Value = PrevMonth.RenderActionEvent (),
-				Type = "postBack",
-				Title = PrevMonth.Label
-			};
-
-			cardButtons.Add (prevButton);
-
-			var nextButton = new CardAction ()
-			{
-				Value = NextMonth.RenderActionEvent (),
-				Type = "postBack",
-				Title = NextMonth.Label
-			};
-
-			cardButtons.Add (nextButton);
-
-			var buttonCard = new ThumbnailCard ()
-			{
-				Buttons = cardButtons
-			};
-
-			attachments.Add (buttonCard.ToAttachment ());
-
-			return attachments;
 		}
 
 		enum CardSupport

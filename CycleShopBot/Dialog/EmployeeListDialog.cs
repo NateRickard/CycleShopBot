@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using AdaptiveCards;
+using CycleShopBot.Cards;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Luis.Models;
 using Microsoft.Bot.Connector;
@@ -14,7 +15,7 @@ using Newtonsoft.Json.Converters;
 namespace CycleShopBot
 {
 	[Serializable]
-	public class EmployeeList : BotActionDialog<IMessageActivity>
+	public class EmployeeListDialog : BotActionDialog<IMessageActivity>
 	{
 		string selectedRegion = null;
 		string selectedEmployeeID = null;
@@ -25,7 +26,7 @@ namespace CycleShopBot
 
 		static readonly HttpClient Client = new HttpClient ();
 
-		public EmployeeList (LuisResult luisResult)
+		public EmployeeListDialog (LuisResult luisResult)
 		{
 			this.luisResult = luisResult;
 		}

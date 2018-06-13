@@ -1,26 +1,26 @@
+using CycleShopBot.Cards;
+using Microsoft.Bot.Builder.Dialogs;
+using Microsoft.Bot.Builder.Luis.Models;
+using Microsoft.Bot.Connector;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using AdaptiveCards;
-using Microsoft.Bot.Builder.Dialogs;
-using Microsoft.Bot.Builder.Luis.Models;
-using Microsoft.Bot.Connector;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace CycleShopBot
 {
 	[Serializable]
-	public class EmployeeDetails : BotActionDialog<IMessageActivity>
+	public class EmployeeDetailsDialog : BotActionDialog<IMessageActivity>
 	{
-		int selectedEmployeeID = 0;
+		readonly int selectedEmployeeID = 0;
 
 		static readonly HttpClient Client = new HttpClient ();
 
-		public EmployeeDetails (LuisResult luisResult)
+		public EmployeeDetailsDialog (LuisResult luisResult)
 		{
 			selectedEmployeeID = findEmployee (luisResult);
 		}
@@ -57,10 +57,11 @@ namespace CycleShopBot
 			var replyToConversation = context.MakeMessage ();
 			replyToConversation.Attachments = new List<Attachment> ();
 
-			AdaptiveCard card = new EmployeeCard (employee);
+			var card = new EmployeeCard (employee);
+			replyToConversation.Attachments.Add (card.AsAttachment ());
 
-			replyToConversation.Attachments.Add (new Attachment () { ContentType = AdaptiveCard.ContentType, Content = card });
 			await context.PostAsync (replyToConversation);
+
 			context.Wait (MessageReceived);
 		}
 
@@ -93,7 +94,7 @@ namespace CycleShopBot
 			}
 		}
 
-		public static readonly JsonSerializerSettings Settings = new JsonSerializerSettings
+		static readonly JsonSerializerSettings Settings = new JsonSerializerSettings
 		{
 			MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
 			DateParseHandling = DateParseHandling.None,

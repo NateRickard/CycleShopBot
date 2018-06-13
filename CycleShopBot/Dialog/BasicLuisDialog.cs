@@ -41,7 +41,7 @@ namespace CycleShopBot
 		[LuisIntent ("EmployeeList")]
 		public Task EmployeeListIntent (IDialogContext context, IAwaitable<IMessageActivity> activity, LuisResult result)
 		{
-			context.Call (new EmployeeList (result), ResumeAfterDialog);
+			context.Call (new EmployeeListDialog (result), ResumeAfterDialog);
 
 			return Task.Delay (0);
 		}
@@ -49,7 +49,7 @@ namespace CycleShopBot
 		[LuisIntent ("EmployeeDetails")]
 		public Task EmployeeDetailsIntent (IDialogContext context, IAwaitable<IMessageActivity> activity, LuisResult result)
 		{
-			context.Call (new EmployeeDetails (result), ResumeAfterDialog);
+			context.Call (new EmployeeDetailsDialog (result), ResumeAfterDialog);
 
 			return Task.Delay (0);
 		}
@@ -62,9 +62,9 @@ namespace CycleShopBot
 			helpMessage.SuggestedActions = new SuggestedActions ()
 			{
 				Actions = new List<CardAction> ()
-			{
-				new CardAction(){ Title = "Show Sample Queries", Type=ActionTypes.ImBack, Value="Show Samples" }
-			}
+				{
+					new CardAction(){ Title = "Show Sample Queries", Type=ActionTypes.ImBack, Value="Show Samples" }
+				}
 			};
 
 			await context.PostAsync (helpMessage);
@@ -79,11 +79,11 @@ namespace CycleShopBot
 			examplesMessage.SuggestedActions = new SuggestedActions ()
 			{
 				Actions = new List<CardAction> ()
-			{
-				new CardAction(){ Title = "Top Tire Sales", Type=ActionTypes.ImBack, Value="Show me top sales for Touring Tire in April" },
-				new CardAction(){ Title = "Product List", Type=ActionTypes.ImBack, Value="List Products" },
-				new CardAction(){ Title = "Employees in UK", Type=ActionTypes.ImBack, Value="Show employees in UK" }
-			}
+				{
+					new CardAction(){ Title = "Top Tire Sales", Type=ActionTypes.ImBack, Value="Show me top sales for Touring Tire in April" },
+					new CardAction(){ Title = "Product List", Type=ActionTypes.ImBack, Value="List Products" },
+					new CardAction(){ Title = "Employees in UK", Type=ActionTypes.ImBack, Value="Show employees in UK" }
+				}
 			};
 
 			await context.PostAsync (examplesMessage);
@@ -102,7 +102,6 @@ namespace CycleShopBot
 			await context.PostAsync (replyMessage);
 			context.Wait (MessageReceived);
 		}
-
 
 		[LuisIntent ("SalesReport")]
 		public async Task SalesReportIntent (IDialogContext context, LuisResult result)
