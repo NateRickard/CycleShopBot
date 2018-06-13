@@ -16,33 +16,15 @@ namespace CycleShopBot
 	[Serializable]
 	public abstract class BotActionDialog<TResult> : IDialog<TResult>
 	{
-		List<Command> Commands = new List<Command> ();
+		//List<Command> Commands = new List<Command> ();
+		readonly List<BotAction> Actions = new List<BotAction> ();
 
-		protected Command DefineCommand (string label, BotAction action)
+		protected BotAction DefineAction (string type, params string[] dataMembers)
 		{
-			var cmd = Command.Define (label, action);
+			var action = BotAction.Define (type, dataMembers);
+			Actions.Add (action);
 
-			Commands.Add (cmd);
-
-			return cmd;
-		}
-
-		protected Command<TOut> DefineCommand<TOut> (string label, BotAction action, Func<TOut> dataFactory)
-		{
-			var cmd = Command.Define (label, action, dataFactory);
-
-			Commands.Add (cmd);
-
-			return cmd;
-		}
-
-		protected Command<TIn, TOut> DefineCommand<TIn, TOut> (string label, BotAction action, Func<TIn, TOut> dataFactory)
-		{
-			var cmd = Command.Define (label, action, dataFactory);
-
-			Commands.Add (cmd);
-
-			return cmd;
+			return action;
 		}
 
 		public async virtual Task StartAsync (IDialogContext context)
@@ -70,7 +52,7 @@ namespace CycleShopBot
 			else if (message.Type == ActivityTypes.Message)
 			{
 				// is this a command the current dialog has defined??
-				var cmd = Commands.FirstOrDefault (c => c.IsCommandLabel (message.Text));
+				var cmd = Actions.Select (a => a.Commands.FirstOrDefault (c => c.IsCommandLabel (message.Text))).FirstOrDefault ();
 
 				if (cmd != null)
 				{

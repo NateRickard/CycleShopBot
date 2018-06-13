@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -7,6 +8,8 @@ namespace CycleShopBot
 	[Serializable]
 	public class BotAction
 	{
+		internal List<Command> Commands { get; } = new List<Command> ();
+
 		/// <summary>
 		/// The type or name of event to be triggered and handled.
 		/// </summary>
@@ -47,6 +50,33 @@ namespace CycleShopBot
 				Type = type,
 				EventTemplate = builder.ToString ()
 			};
+		}
+
+		public Command DefineCommand (string label)
+		{
+			var cmd = Command.Define (label, this);
+
+			Commands.Add (cmd);
+
+			return cmd;
+		}
+
+		public Command<TOut> DefineCommand<TOut> (string label, Func<TOut> dataFactory)
+		{
+			var cmd = Command.Define (label, this, dataFactory);
+
+			Commands.Add (cmd);
+
+			return cmd;
+		}
+
+		public Command<TIn, TOut> DefineCommand<TIn, TOut> (string label, Func<TIn, TOut> dataFactory)
+		{
+			var cmd = Command.Define (label, this, dataFactory);
+
+			Commands.Add (cmd);
+
+			return cmd;
 		}
 
 		/// <summary>

@@ -13,7 +13,7 @@ namespace CycleShopBot
 
 		public bool IsCommandLabel (string label)
 		{
-			return this.Label == label;
+			return Label == label;
 		}
 
 		internal static Command Define (string label, BotAction action)
@@ -45,13 +45,6 @@ namespace CycleShopBot
 			);
 		}
 
-		public Command WithAction (BotAction action)
-		{
-			this.Action = action;
-
-			return this;
-		}
-
 		public virtual string RenderActionEvent ()
 		{
 			return Action.EventTemplate; // no data members needed
@@ -68,14 +61,6 @@ namespace CycleShopBot
 			Label = label;
 			Action = action;
 			DataFactory = dataFactory;
-		}
-
-		public Command<TOut> WithAction (BotAction action, Func<TOut> dataFactory)
-		{
-			this.Action = action;
-			this.DataFactory = dataFactory;
-
-			return this;
 		}
 
 		public override string RenderActionEvent ()
@@ -105,8 +90,8 @@ namespace CycleShopBot
 
 		public Command<TIn, TOut> WithAction (BotAction action, Func<TIn, TOut> dataFactory)
 		{
-			this.Action = action;
-			this.DataFactory = dataFactory;
+			Action = action;
+			DataFactory = dataFactory;
 
 			return this;
 		}

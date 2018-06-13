@@ -40,7 +40,7 @@ namespace CycleShopBot
 			{ "skype", CardSupport.Adaptive }
 		};
 
-		static BotAction MonthChange = BotAction.Define ("MonthChange", "Month");
+		readonly BotAction MonthChange;
 		readonly Command<int> PrevMonth;
 		readonly Command<int> NextMonth;
 
@@ -48,8 +48,9 @@ namespace CycleShopBot
 		{
 			this.luisResult = luisResult;
 
-			PrevMonth = DefineCommand ("Prev Month", MonthChange, () => selectedMonth == 1 ? 12 : selectedMonth - 1);
-			NextMonth = DefineCommand ("Next Month", MonthChange, () => selectedMonth == 12 ? 1 : selectedMonth + 1);
+			MonthChange = DefineAction ("MonthChange", "Month");
+			PrevMonth = MonthChange.DefineCommand ("Prev Month", () => selectedMonth == 1 ? 12 : selectedMonth - 1);
+			NextMonth = MonthChange.DefineCommand ("Next Month", () => selectedMonth == 12 ? 1 : selectedMonth + 1);
 		}
 
 		public async override Task StartAsync (IDialogContext context)
