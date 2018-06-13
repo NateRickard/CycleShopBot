@@ -1,14 +1,15 @@
 using System;
 using AdaptiveCards;
+using Microsoft.Bot.Connector;
 
-namespace CycleShopBot
+namespace CycleShopBot.Cards
 {
 	public class EmployeeCard : AdaptiveCard
 	{
 		public EmployeeCard (EmployeeItem employee)
 		{
 			// Add text to the card.
-			this.Body.Add (new AdaptiveTextBlock ()
+			Body.Add (new AdaptiveTextBlock ()
 			{
 				Text = employee.FullName,
 				Size = AdaptiveTextSize.Large,
@@ -16,34 +17,43 @@ namespace CycleShopBot
 			});
 
 			// Add text to the card.
-			this.Body.Add (new AdaptiveTextBlock ()
+			Body.Add (new AdaptiveTextBlock ()
 			{
 				Text = employee.Title
 			});
 
-			this.Body.Add (new AdaptiveTextBlock ()
+			Body.Add (new AdaptiveTextBlock ()
 			{
 				Text = $"Vacation: {employee.VacationHours} hours"
 			});
 
 			// Add buttons to the card.
-			this.Actions.Add (new AdaptiveOpenUrlAction ()
+			Actions.Add (new AdaptiveOpenUrlAction ()
 			{
 				Url = new Uri ($"mailto:{employee.EmailAddress}"),
 				Title = $"Email {employee.FirstName}"
 			});
 
-			//this.Actions.Add(new AdaptiveOpenUrlAction()
+			//Actions.Add(new AdaptiveOpenUrlAction()
 			//{
 			//    Url = new Uri("tel:{employee.Phone}"),
 			//    Title = $"Call {employee.FirstName}"
 			//});
 
-			//this.Actions.Add(new AdaptiveOpenUrlAction()
+			//Actions.Add(new AdaptiveOpenUrlAction()
 			//{
 			//    Url = new Uri($"sms:{employee.Phone}"),
 			//    Title = $"Text {employee.FirstName}"
 			//});
+		}
+
+		public Attachment AsAttachment ()
+		{
+			return new Attachment ()
+			{
+				ContentType = ContentType,
+				Content = this
+			};
 		}
 	}
 }
