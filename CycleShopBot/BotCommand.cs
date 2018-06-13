@@ -3,31 +3,31 @@
 namespace CycleShopBot
 {
 	[Serializable]
-	public class Command
+	public class BotCommand
 	{
 		public string Label { get; protected set; }
 
 		public BotAction Action { get; set; }
 
-		protected Command () { }
+		protected BotCommand () { }
 
 		public bool IsCommandLabel (string label)
 		{
 			return Label == label;
 		}
 
-		internal static Command Define (string label, BotAction action)
+		internal static BotCommand Define (string label, BotAction action)
 		{
-			return new Command
+			return new BotCommand
 			{
 				Label = label,
 				Action = action
 			};
 		}
 
-		internal static Command<TOut> Define<TOut> (string label, BotAction action, Func<TOut> dataFactory)
+		internal static BotCommand<TOut> Define<TOut> (string label, BotAction action, Func<TOut> dataFactory)
 		{
-			return new Command<TOut>
+			return new BotCommand<TOut>
 			(
 				label,
 				action,
@@ -35,9 +35,9 @@ namespace CycleShopBot
 			);
 		}
 
-		internal static Command<TIn, TOut> Define<TIn, TOut> (string label, BotAction action, Func<TIn, TOut> dataFactory)
+		internal static BotCommand<TIn, TOut> Define<TIn, TOut> (string label, BotAction action, Func<TIn, TOut> dataFactory)
 		{
-			return new Command<TIn, TOut>
+			return new BotCommand<TIn, TOut>
 			(
 				label,
 				action,
@@ -52,11 +52,11 @@ namespace CycleShopBot
 	}
 
 	[Serializable]
-	public class Command<TOut> : Command
+	public class BotCommand<TOut> : BotCommand
 	{
 		public Func<TOut> DataFactory { get; protected set; }
 
-		public Command (string label, BotAction action, Func<TOut> dataFactory)
+		public BotCommand (string label, BotAction action, Func<TOut> dataFactory)
 		{
 			Label = label;
 			Action = action;
@@ -77,18 +77,18 @@ namespace CycleShopBot
 	}
 
 	[Serializable]
-	public class Command<TIn, TOut> : Command
+	public class BotCommand<TIn, TOut> : BotCommand
 	{
 		public Func<TIn, TOut> DataFactory { get; protected set; }
 
-		public Command (string label, BotAction action, Func<TIn, TOut> dataFactory)
+		public BotCommand (string label, BotAction action, Func<TIn, TOut> dataFactory)
 		{
 			Label = label;
 			Action = action;
 			DataFactory = dataFactory;
 		}
 
-		public Command<TIn, TOut> WithAction (BotAction action, Func<TIn, TOut> dataFactory)
+		public BotCommand<TIn, TOut> WithAction (BotAction action, Func<TIn, TOut> dataFactory)
 		{
 			Action = action;
 			DataFactory = dataFactory;

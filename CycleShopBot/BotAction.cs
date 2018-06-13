@@ -8,7 +8,7 @@ namespace CycleShopBot
 	[Serializable]
 	public class BotAction
 	{
-		internal List<Command> Commands { get; } = new List<Command> ();
+		internal List<BotCommand> Commands { get; } = new List<BotCommand> ();
 
 		/// <summary>
 		/// The type or name of event to be triggered and handled.
@@ -52,27 +52,27 @@ namespace CycleShopBot
 			};
 		}
 
-		public Command DefineCommand (string label)
+		public BotCommand DefineCommand (string label)
 		{
-			var cmd = Command.Define (label, this);
+			var cmd = BotCommand.Define (label, this);
 
 			Commands.Add (cmd);
 
 			return cmd;
 		}
 
-		public Command<TOut> DefineCommand<TOut> (string label, Func<TOut> dataFactory)
+		public BotCommand<TOut> DefineCommand<TOut> (string label, Func<TOut> dataFactory)
 		{
-			var cmd = Command.Define (label, this, dataFactory);
+			var cmd = BotCommand.Define (label, this, dataFactory);
 
 			Commands.Add (cmd);
 
 			return cmd;
 		}
 
-		public Command<TIn, TOut> DefineCommand<TIn, TOut> (string label, Func<TIn, TOut> dataFactory)
+		public BotCommand<TIn, TOut> DefineCommand<TIn, TOut> (string label, Func<TIn, TOut> dataFactory)
 		{
-			var cmd = Command.Define (label, this, dataFactory);
+			var cmd = BotCommand.Define (label, this, dataFactory);
 
 			Commands.Add (cmd);
 

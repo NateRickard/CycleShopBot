@@ -7,7 +7,7 @@ namespace CycleShopBot.Cards
 {
 	public class AdaptiveSalesCard : AdaptiveCard
 	{
-		public AdaptiveSalesCard (string product, int numberCustomers, int month, List<CustomerSales> salesData, Command<int> prevMonth, Command<int> nextMonth)
+		public AdaptiveSalesCard (string product, int numberCustomers, int month, List<CustomerSales> salesData, BotCommand<int> prevMonth, BotCommand<int> nextMonth)
 		{
 			var facts = new List<AdaptiveFact> ();
 

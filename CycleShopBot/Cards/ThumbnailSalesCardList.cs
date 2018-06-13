@@ -6,7 +6,7 @@ namespace CycleShopBot.Cards
 {
 	public class ThumbnailSalesCardList : List<ThumbnailCard>
 	{
-		public ThumbnailSalesCardList (string product, int numberCustomers, int month, List<CustomerSales> salesData, Command<int> prevMonth, Command<int> nextMonth)
+		public ThumbnailSalesCardList (string product, int numberCustomers, int month, List<CustomerSales> salesData, BotCommand<int> prevMonth, BotCommand<int> nextMonth)
 		{
 			var titleCard = new ThumbnailCard ()
 			{

@@ -41,8 +41,8 @@ namespace CycleShopBot
 		};
 
 		readonly BotAction MonthChange;
-		readonly Command<int> PrevMonth;
-		readonly Command<int> NextMonth;
+		readonly BotCommand<int> PrevMonth;
+		readonly BotCommand<int> NextMonth;
 
 		public CustomerSalesDataDialog (LuisResult luisResult)
 		{
