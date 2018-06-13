@@ -19,17 +19,12 @@ namespace CycleShopBot
 		const int DefaultNumberCustomers = 5;
 		const int TooManyProductsLimit = 10;
 
-		string selectedProduct;
-		int numberCustomers;
+		readonly int numberCustomers;
+		readonly (DateTime Min, DateTime Max, int StartIndex, int EndIndex) dateRange;
+		(string SelectedProduct, List<string> Products) productSelection;
 		int selectedMonth;
-		(DateTime Min, DateTime Max, int StartIndex, int EndIndex) dateRange;
-
-		[NonSerialized]
-		readonly LuisResult luisResult;
 
 		static readonly HttpClient Client = new HttpClient ();
-
-		static readonly bool MockDataEnabled = Convert.ToBoolean (ConfigurationManager.AppSettings ["MockData"] ?? "false");
 
 		static readonly Dictionary<string, CardSupport?> ChannelCardSupport = new Dictionary<string, CardSupport?> ()
 		{
@@ -40,37 +35,42 @@ namespace CycleShopBot
 			{ "skype", CardSupport.Adaptive }
 		};
 
+		// settings to properly handle our scientific notation formatted decimal values
+		static readonly JsonSerializerSettings SerializerSettings = new JsonSerializerSettings
+		{
+			FloatParseHandling = FloatParseHandling.Decimal,
+			Converters = new List<JsonConverter> { new DecimalConverter () }
+		};
+
 		readonly BotAction MonthChange;
 		readonly BotCommand<int> PrevMonth;
 		readonly BotCommand<int> NextMonth;
 
 		public CustomerSalesDataDialog (LuisResult luisResult)
 		{
-			this.luisResult = luisResult;
-
 			MonthChange = DefineAction ("MonthChange", "Month");
 			PrevMonth = MonthChange.DefineCommand ("Prev Month", () => selectedMonth == 1 ? 12 : selectedMonth - 1);
 			NextMonth = MonthChange.DefineCommand ("Next Month", () => selectedMonth == 12 ? 1 : selectedMonth + 1);
+
+			productSelection = FindProducts (luisResult);
+			dateRange = GetDateRanges (luisResult);
+			numberCustomers = GetNumberCustomers (luisResult);
 		}
 
 		public async override Task StartAsync (IDialogContext context)
 		{
-			var products = FindProducts (luisResult);
-			dateRange = GetDateRanges (luisResult);
-			numberCustomers = GetNumberCustomers (luisResult);
-
 			// try to find an exact product match
-			if (products.SelectedProduct != null)
+			if (productSelection.SelectedProduct != null)
 			{
-				await context.PostAsync ($"Sure, I can help you with sales data for {products.SelectedProduct.ToTitleCase()}");
+				await context.PostAsync ($"Sure, I can help you with sales data for {productSelection.SelectedProduct.ToTitleCase()}");
 
-				await ProductSelected (context, new AwaitableFromItem<string> (products.SelectedProduct));
+				await ProductSelected (context, new AwaitableFromItem<string> (productSelection.SelectedProduct));
 			}
-			else if (products.Products.Count > 0) // if more than one is matched (e.g. "Tires"), go ahead and spin up a selection dialog
+			else if (productSelection.Products.Count > 0) // if more than one is matched (e.g. "Tires"), go ahead and spin up a selection dialog
 			{
-				if (products.Products.Count <= TooManyProductsLimit) // more than one product entity match - let them choose!
+				if (productSelection.Products.Count <= TooManyProductsLimit) // more than one product entity match - let them choose!
 				{
-					context.Call (new ProductSelectionDialog (products.Products), ProductSelected);
+					context.Call (new ProductSelectionDialog (productSelection.Products), ProductSelected);
 				}
 				else
 				{
@@ -189,7 +189,7 @@ namespace CycleShopBot
 		{
 			try
 			{
-				selectedProduct = await productResult;
+				productSelection.SelectedProduct = await productResult;
 
 				// if the date range seems to be more than a 1 month span we need to ket the user know that's not supported
 				if (dateRange.Min.Month != dateRange.Max.AddSeconds (-1).Month)
@@ -215,7 +215,7 @@ namespace CycleShopBot
 			await context.SendTypingIndicator ();
 
 			// get SAP data with parameterized query and return it
-			var data = await GetTopCustomerSalesForProduct (context, selectedProduct, selectedMonth, numberCustomers);
+			var data = await GetTopCustomerSalesForProduct (context, productSelection.SelectedProduct, selectedMonth, numberCustomers);
 
 			var attachments = new List<Attachment> ();
 
@@ -225,13 +225,13 @@ namespace CycleShopBot
 			{
 				case CardSupport.Adaptive:
 
-					var card = new AdaptiveSalesCard (selectedProduct, numberCustomers, selectedMonth, data, PrevMonth, NextMonth);
+					var card = new AdaptiveSalesCard (productSelection.SelectedProduct, numberCustomers, selectedMonth, data, PrevMonth, NextMonth);
 					attachments.Add (card.AsAttachment ());
 
 					break;
 				case CardSupport.Thumbnail:
 
-					var cardList = new ThumbnailSalesCardList (selectedProduct, numberCustomers, selectedMonth, data, PrevMonth, NextMonth);
+					var cardList = new ThumbnailSalesCardList (productSelection.SelectedProduct, numberCustomers, selectedMonth, data, PrevMonth, NextMonth);
 					attachments.AddRange (cardList.AsAttachmentList ());
 
 					break;
@@ -256,7 +256,7 @@ namespace CycleShopBot
 		{
 			try
 			{
-				if (!MockDataEnabled)
+				if (!BotContext.MockDataEnabled)
 				{
 					var functionUri = context.GetFunctionUrl ("TopCustomersForProduct",
 						(nameof (product), product),
@@ -268,23 +268,14 @@ namespace CycleShopBot
 					using (HttpContent content = response.Content)
 					{
 						// read the response as a string
-						var jsonRaw = await content.ReadAsStringAsync ();
-						// clean up nasty formatted json
-						var json = jsonRaw.Trim ('"').Replace (@"\", string.Empty);
+						var json = await content.ReadAsStringAsync ();
 
-						// settings to properly handle our scientific notation formatted decimal values
-						var settings = new JsonSerializerSettings
-						{
-							FloatParseHandling = FloatParseHandling.Decimal,
-							Converters = new List<JsonConverter> { new DecimalConverter () }
-						};
-
-						return JsonConvert.DeserializeObject<List<CustomerSales>> (json, settings);
+						return JsonConvert.DeserializeObject<List<CustomerSales>> (json.CleanJson (), SerializerSettings);
 					}
 				}
 				else
 				{
-					return MockData.CustomerSales;
+					return MockData.CustomerSales.Take (count).ToList ();
 				}
 			}
 			catch

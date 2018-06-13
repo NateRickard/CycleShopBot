@@ -9,21 +9,21 @@ namespace CycleShopBot
 	[Serializable]
 	public class EmployeeSelectionDialog : IDialog<string>
 	{
-		private List<EmployeeItem> employees;
+		readonly List<EmployeeItem> employees;
 
 		public EmployeeSelectionDialog (List<EmployeeItem> employeeList)
 		{
-			this.employees = employeeList;
+			employees = employeeList;
 		}
 
 		public async Task StartAsync (IDialogContext context)
 		{
-			await showRegionPrompt (context);
+			await ShowRegionPrompt (context);
 		}
 
-		private async Task showRegionPrompt (IDialogContext context)
+		private async Task ShowRegionPrompt (IDialogContext context)
 		{
-			PromptDialog.Choice<string> (
+			PromptDialog.Choice (
 				context,
 				AfterMenuSelection,
 				employees.Select (x => x.EmployeeKey.ToString ()),

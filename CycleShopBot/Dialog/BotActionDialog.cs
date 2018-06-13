@@ -16,7 +16,6 @@ namespace CycleShopBot
 	[Serializable]
 	public abstract class BotActionDialog<TResult> : IDialog<TResult>
 	{
-		//List<Command> Commands = new List<Command> ();
 		readonly List<BotAction> Actions = new List<BotAction> ();
 
 		protected BotAction DefineAction (string type, params string[] dataMembers)

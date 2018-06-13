@@ -1,16 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
-using AdaptiveCards;
-using CycleShopBot.Cards;
+﻿using CycleShopBot.Cards;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Luis.Models;
 using Microsoft.Bot.Connector;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace CycleShopBot
 {
@@ -19,23 +18,28 @@ namespace CycleShopBot
 	{
 		string selectedRegion = null;
 		string selectedEmployeeID = null;
+		readonly int regionCode;
 		List<EmployeeItem> employees;
-
-		[NonSerialized]
-		readonly LuisResult luisResult;
 
 		static readonly HttpClient Client = new HttpClient ();
 
+		static readonly JsonSerializerSettings SerializerSettings = new JsonSerializerSettings
+		{
+			MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
+			DateParseHandling = DateParseHandling.None,
+			Converters = {
+				new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal }
+			},
+		};
+
 		public EmployeeListDialog (LuisResult luisResult)
 		{
-			this.luisResult = luisResult;
+			regionCode = FindRegion (luisResult);
 		}
 
 		public async override Task StartAsync (IDialogContext context)
 		{
-			var regionCode = findRegion (luisResult);
-
-			// try to find an exact product match
+			// region code available?
 			if (regionCode > 0)
 			{
 				await DisplayEmployeeList (context, regionCode, "None");
@@ -104,11 +108,7 @@ namespace CycleShopBot
 
 			var card = new EmployeeCard (employee);
 
-			replyToConversation.Attachments.Add (new Attachment ()
-			{
-				ContentType = AdaptiveCard.ContentType,
-				Content = card
-			});
+			replyToConversation.Attachments.Add (card.AsAttachment ());
 
 			await context.PostAsync (replyToConversation);
 
@@ -119,20 +119,25 @@ namespace CycleShopBot
 		{
 			try
 			{
-				var functionUri = context.GetFunctionUrl ("SalesPeopleInRegion",
+				if (!BotContext.MockDataEnabled)
+				{
+					var functionUri = context.GetFunctionUrl ("SalesPeopleInRegion",
 						(nameof (regionCode), regionCode),
 						(nameof (region), region));
 
-				var response = await Client.PostAsync (functionUri, null);
+					var response = await Client.PostAsync (functionUri, null);
 
-				using (HttpContent content = response.Content)
+					using (HttpContent content = response.Content)
+					{
+						// read the response as a string
+						var json = await content.ReadAsStringAsync ();
+
+						return JsonConvert.DeserializeObject<List<EmployeeItem>> (json.CleanJson (), SerializerSettings);
+					}
+				}
+				else
 				{
-					// read the response as a string
-					var jsonRaw = await content.ReadAsStringAsync ();
-					// clean up nasty formatted json
-					var json = jsonRaw.Trim ('"').Replace (@"\", string.Empty);
-
-					return JsonConvert.DeserializeObject<List<EmployeeItem>> (json, Settings);
+					return MockData.Employees;
 				}
 			}
 			catch
@@ -144,16 +149,7 @@ namespace CycleShopBot
 			}
 		}
 
-		static readonly JsonSerializerSettings Settings = new JsonSerializerSettings
-		{
-			MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
-			DateParseHandling = DateParseHandling.None,
-			Converters = {
-				new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal }
-			},
-		};
-
-		private int findRegion (LuisResult result)
+		private int FindRegion (LuisResult result)
 		{
 			string region = "0";
 			var regions = new List<string> ();

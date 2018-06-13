@@ -61,5 +61,11 @@ namespace CycleShopBot
 
 			return functionUrl;
 		}
+
+		public static string CleanJson (this string rawJson)
+		{
+			// clean up nasty formatted json
+			return rawJson.Trim ('"').Replace (@"\", string.Empty);
+		}
 	}
 }

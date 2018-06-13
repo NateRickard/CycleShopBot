@@ -19,10 +19,10 @@ namespace CycleShopBot
 
 		public async Task StartAsync (IDialogContext context)
 		{
-			await showMonthPrompt (context, minDate, maxDate);
+			await ShowMonthPrompt (context, minDate, maxDate);
 		}
 
-		private async Task showMonthPrompt (IDialogContext context, DateTime dateRangeMin, DateTime dateRangeMax)
+		private async Task ShowMonthPrompt (IDialogContext context, DateTime dateRangeMin, DateTime dateRangeMax)
 		{
 			await context.PostAsync ($"I'll need you to select the month as well.");
 
@@ -36,7 +36,7 @@ namespace CycleShopBot
 				dtNext = dtNext.AddMonths (1);
 			}
 
-			PromptDialog.Choice<string> (
+			PromptDialog.Choice (
 				context,
 				AfterMenuSelection,
 				monthOptions,

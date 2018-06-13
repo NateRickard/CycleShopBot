@@ -20,9 +20,18 @@ namespace CycleShopBot
 
 		static readonly HttpClient Client = new HttpClient ();
 
+		static readonly JsonSerializerSettings SerializerSettings = new JsonSerializerSettings
+		{
+			MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
+			DateParseHandling = DateParseHandling.None,
+			Converters = {
+				new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal }
+			},
+		};
+
 		public EmployeeDetailsDialog (LuisResult luisResult)
 		{
-			selectedEmployeeID = findEmployee (luisResult);
+			selectedEmployeeID = FindEmployee (luisResult);
 		}
 
 		public override async Task StartAsync (IDialogContext context)
@@ -32,7 +41,7 @@ namespace CycleShopBot
 			await DisplayEmployeeCard (context, data);
 		}
 
-		private int findEmployee (LuisResult result)
+		private int FindEmployee (LuisResult result)
 		{
 			string employeeId = "0";
 			var regions = new List<string> ();
@@ -69,20 +78,25 @@ namespace CycleShopBot
 		{
 			try
 			{
-				var functionUri = context.GetFunctionUrl ("EmployeeDetails",
+				if (!BotContext.MockDataEnabled)
+				{
+					var functionUri = context.GetFunctionUrl ("EmployeeDetails",
 					(nameof (employeeid), employeeid));
 
-				var response = await Client.PostAsync (functionUri, null);
+					var response = await Client.PostAsync (functionUri, null);
 
-				using (HttpContent content = response.Content)
+					using (HttpContent content = response.Content)
+					{
+						// read the response as a string
+						var json = await content.ReadAsStringAsync ();
+
+						var data = JsonConvert.DeserializeObject<List<EmployeeItem>> (json.CleanJson (), SerializerSettings);
+						return data.FirstOrDefault ();
+					}
+				}
+				else
 				{
-					// read the response as a string
-					var jsonRaw = await content.ReadAsStringAsync ();
-					// clean up nasty formatted json
-					var json = jsonRaw.Trim ('"').Replace (@"\", string.Empty);
-
-					var data = JsonConvert.DeserializeObject<List<EmployeeItem>> (json, Settings);
-					return data [0];
+					return MockData.Employees.FirstOrDefault (e => e.EmployeeKey == employeeid);
 				}
 			}
 			catch
@@ -93,14 +107,5 @@ namespace CycleShopBot
 				throw Exceptions.DataException;
 			}
 		}
-
-		static readonly JsonSerializerSettings Settings = new JsonSerializerSettings
-		{
-			MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
-			DateParseHandling = DateParseHandling.None,
-			Converters = {
-				new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal }
-			},
-		};
 	}
 }

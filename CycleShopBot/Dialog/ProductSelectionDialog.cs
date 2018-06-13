@@ -8,7 +8,7 @@ namespace CycleShopBot
 	[Serializable]
 	public class ProductSelectionDialog : IDialog<string>
 	{
-		List<string> products;
+		readonly List<string> products;
 
 		public ProductSelectionDialog (List<string> products)
 		{
@@ -17,14 +17,14 @@ namespace CycleShopBot
 
 		public async Task StartAsync (IDialogContext context)
 		{
-			await showProductPrompt (context);
+			await ShowProductPrompt (context);
 		}
 
-		private async Task showProductPrompt (IDialogContext context)
+		private async Task ShowProductPrompt (IDialogContext context)
 		{
 			await context.PostAsync ("I found more than one matching product.");
 
-			PromptDialog.Choice<string> (
+			PromptDialog.Choice (
 				context,
 				AfterMenuSelection,
 				products,
