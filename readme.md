@@ -19,6 +19,11 @@ Highlights:
 - Calling into Node.js functions hosted side by side with C# functions
 - A demo mode to use/demo the bot without needing the SAP instance
 
+## Sample Conversation UI
+
+Via the [Bot Framework Emulator v3](https://github.com/Microsoft/BotFramework-Emulator)
+
+![](/data/images/CycleShopBot.gif)
 
 ## Setup
 
