@@ -1,0 +1,1963 @@
+{
+  "luis_schema_version": "3.0.0",
+  "versionId": ".2",
+  "name": "CycleShopBot-89f8",
+  "desc": "LUIS support for the Cycle Shop Bot",
+  "culture": "en-us",
+  "intents": [
+    {
+      "name": "Cancel"
+    },
+    {
+      "name": "Context"
+    },
+    {
+      "name": "EmployeeDetails"
+    },
+    {
+      "name": "EmployeeList"
+    },
+    {
+      "name": "Examples"
+    },
+    {
+      "name": "Greeting"
+    },
+    {
+      "name": "Help"
+    },
+    {
+      "name": "None"
+    },
+    {
+      "name": "Products"
+    },
+    {
+      "name": "Regions"
+    },
+    {
+      "name": "SalesReport"
+    },
+    {
+      "name": "TopCustomersForProduct"
+    }
+  ],
+  "entities": [],
+  "composites": [],
+  "closedLists": [
+    {
+      "name": "Products",
+      "subLists": [
+        {
+          "canonicalForm": "Adjustable Race",
+          "list": [
+            "Race",
+            "Races"
+          ]
+        },
+        {
+          "canonicalForm": "BB Ball Bearing",
+          "list": [
+            "Bearings"
+          ]
+        },
+        {
+          "canonicalForm": "Bearing Ball",
+          "list": [
+            "Bearings"
+          ]
+        },
+        {
+          "canonicalForm": "Blade",
+          "list": [
+            "Blades"
+          ]
+        },
+        {
+          "canonicalForm": "Cable Lock",
+          "list": [
+            "Lock",
+            "Locks"
+          ]
+        },
+        {
+          "canonicalForm": "Chain",
+          "list": [
+            "Chains"
+          ]
+        },
+        {
+          "canonicalForm": "Chain Stays",
+          "list": [
+            "Stay",
+            "Stays"
+          ]
+        },
+        {
+          "canonicalForm": "Chainring",
+          "list": [
+            "Chainrings"
+          ]
+        },
+        {
+          "canonicalForm": "Chainring Bolts",
+          "list": [
+            "Bolt",
+            "Bolts"
+          ]
+        },
+        {
+          "canonicalForm": "Chainring Nut",
+          "list": [
+            "Nut",
+            "Nuts"
+          ]
+        },
+        {
+          "canonicalForm": "Classic Vest, L",
+          "list": [
+            "Vest",
+            "Vests"
+          ]
+        },
+        {
+          "canonicalForm": "Classic Vest, M",
+          "list": [
+            "Vest",
+            "Vests"
+          ]
+        },
+        {
+          "canonicalForm": "Classic Vest, S",
+          "list": [
+            "Vest",
+            "Vests"
+          ]
+        },
+        {
+          "canonicalForm": "Crankarm",
+          "list": [
+            "Crankarm"
+          ]
+        },
+        {
+          "canonicalForm": "Crown Race",
+          "list": [
+            "Race",
+            "Races"
+          ]
+        },
+        {
+          "canonicalForm": "Decal",
+          "list": [
+            "Decal",
+            "Decals"
+          ]
+        },
+        {
+          "canonicalForm": "Down Tube",
+          "list": [
+            "Tube",
+            "Tubes"
+          ]
+        },
+        {
+          "canonicalForm": "Fork Crown",
+          "list": [
+            "Fork"
+          ]
+        },
+        {
+          "canonicalForm": "Fork End",
+          "list": [
+            "Fork"
+          ]
+        },
+        {
+          "canonicalForm": "Freewheel",
+          "list": [
+            "Freewheels"
+          ]
+        },
+        {
+          "canonicalForm": "Front Brakes",
+          "list": [
+            "Brakes",
+            "Brake"
+          ]
+        },
+        {
+          "canonicalForm": "Front Derailleur Cage",
+          "list": [
+            "Cage"
+          ]
+        },
+        {
+          "canonicalForm": "Front Derailleur Linkage",
+          "list": [
+            "Linkage"
+          ]
+        },
+        {
+          "canonicalForm": "Grip Tape",
+          "list": [
+            "Tape"
+          ]
+        },
+        {
+          "canonicalForm": "Guide Pulley",
+          "list": [
+            "Pulley"
+          ]
+        },
+        {
+          "canonicalForm": "HL Crankset",
+          "list": [
+            "Crankset",
+            "Cranksets"
+          ]
+        },
+        {
+          "canonicalForm": "HL Fork",
+          "list": [
+            "Forks"
+          ]
+        },
+        {
+          "canonicalForm": "HL Headset",
+          "list": [
+            "Headsets"
+          ]
+        },
+        {
+          "canonicalForm": "HL Mountain Pedal",
+          "list": [
+            "Pedals",
+            "Pedal"
+          ]
+        },
+        {
+          "canonicalForm": "HL Mountain Seat/Saddle",
+          "list": [
+            "Seat",
+            "Saddle"
+          ]
+        },
+        {
+          "canonicalForm": "HL Mountain Tire",
+          "list": [
+            "Tire",
+            "Tires",
+            "Mountain Tire",
+            "Mountain Tires"
+          ]
+        },
+        {
+          "canonicalForm": "HL Road Handlebars",
+          "list": [
+            "Handelbars"
+          ]
+        },
+        {
+          "canonicalForm": "HL Road Pedal",
+          "list": [
+            "Pedals",
+            "Pedal"
+          ]
+        },
+        {
+          "canonicalForm": "HL Road Rim",
+          "list": [
+            "Rim",
+            "Rims"
+          ]
+        },
+        {
+          "canonicalForm": "HL Road Seat/Saddle",
+          "list": [
+            "Seat",
+            "Saddle"
+          ]
+        },
+        {
+          "canonicalForm": "HL Road Tire",
+          "list": [
+            "Tire",
+            "Tires",
+            "Road Tire",
+            "Road Tires"
+          ]
+        },
+        {
+          "canonicalForm": "Half-Finger Gloves",
+          "list": [
+            "Gloves"
+          ]
+        },
+        {
+          "canonicalForm": "Handlebar Tube",
+          "list": [
+            "Tube",
+            "Tubes"
+          ]
+        },
+        {
+          "canonicalForm": "Head Tube",
+          "list": [
+            "Tube",
+            "Tubes"
+          ]
+        },
+        {
+          "canonicalForm": "Headlights - Dual-Beam",
+          "list": [
+            "Light",
+            "Lights"
+          ]
+        },
+        {
+          "canonicalForm": "Headlights - Weatherproof",
+          "list": [
+            "Light",
+            "Lights"
+          ]
+        },
+        {
+          "canonicalForm": "Headset Ball Bearings",
+          "list": [
+            "Bearings"
+          ]
+        },
+        {
+          "canonicalForm": "LL Crankset",
+          "list": [
+            "Crankset",
+            "Cranksets"
+          ]
+        },
+        {
+          "canonicalForm": "LL Fork",
+          "list": [
+            "Forks"
+          ]
+        },
+        {
+          "canonicalForm": "LL Headset",
+          "list": [
+            "Headsets"
+          ]
+        },
+        {
+          "canonicalForm": "LL Mountain Pedal",
+          "list": [
+            "Pedals",
+            "Pedal"
+          ]
+        },
+        {
+          "canonicalForm": "LL Mountain Seat/Saddle",
+          "list": [
+            "Seat",
+            "Saddle"
+          ]
+        },
+        {
+          "canonicalForm": "LL Mountain Tire",
+          "list": [
+            "Tire",
+            "Tires",
+            "Mountain Tire",
+            "Mountain Tires"
+          ]
+        },
+        {
+          "canonicalForm": "LL Road Handlebars",
+          "list": [
+            "Handelbars"
+          ]
+        },
+        {
+          "canonicalForm": "LL Road Pedal",
+          "list": [
+            "Pedals",
+            "Pedal"
+          ]
+        },
+        {
+          "canonicalForm": "LL Road Rim",
+          "list": [
+            "Rim",
+            "Rims"
+          ]
+        },
+        {
+          "canonicalForm": "LL Road Seat/Saddle",
+          "list": [
+            "Seat",
+            "Saddle"
+          ]
+        },
+        {
+          "canonicalForm": "LL Road Tire",
+          "list": [
+            "Tire",
+            "Tires",
+            "Road Tire",
+            "Road Tires"
+          ]
+        },
+        {
+          "canonicalForm": "ML Crankset",
+          "list": [
+            "Crankset",
+            "Cranksets"
+          ]
+        },
+        {
+          "canonicalForm": "ML Fork",
+          "list": [
+            "Forks"
+          ]
+        },
+        {
+          "canonicalForm": "ML Headset",
+          "list": [
+            "Headsets"
+          ]
+        },
+        {
+          "canonicalForm": "ML Mountain Pedal",
+          "list": [
+            "Pedals",
+            "Pedal"
+          ]
+        },
+        {
+          "canonicalForm": "ML Mountain Seat/Saddle",
+          "list": [
+            "Seat",
+            "Saddle"
+          ]
+        },
+        {
+          "canonicalForm": "ML Mountain Tire",
+          "list": [
+            "Tire",
+            "Tires",
+            "Mountain Tire",
+            "Mountain Tires"
+          ]
+        },
+        {
+          "canonicalForm": "ML Road Handlebars",
+          "list": [
+            "Handelbars"
+          ]
+        },
+        {
+          "canonicalForm": "ML Road Pedal",
+          "list": [
+            "Pedals",
+            "Pedal"
+          ]
+        },
+        {
+          "canonicalForm": "ML Road Rim",
+          "list": [
+            "Rim",
+            "Rims"
+          ]
+        },
+        {
+          "canonicalForm": "ML Road Seat/Saddle",
+          "list": [
+            "Seat",
+            "Saddle"
+          ]
+        },
+        {
+          "canonicalForm": "ML Road Tire",
+          "list": [
+            "Tire",
+            "Tires",
+            "Road Tire",
+            "Road Tires"
+          ]
+        },
+        {
+          "canonicalForm": "Men's Bib-Shorts, L",
+          "list": [
+            "Shorts",
+            "Bibs"
+          ]
+        },
+        {
+          "canonicalForm": "Men's Bib-Shorts, M",
+          "list": [
+            "Shorts",
+            "Bibs"
+          ]
+        },
+        {
+          "canonicalForm": "Men's Bib-Shorts, S",
+          "list": [
+            "Shorts",
+            "Bibs"
+          ]
+        },
+        {
+          "canonicalForm": "Men's Sports Shorts, L",
+          "list": [
+            "Shorts"
+          ]
+        },
+        {
+          "canonicalForm": "Men's Sports Shorts, M",
+          "list": [
+            "Shorts"
+          ]
+        },
+        {
+          "canonicalForm": "Men's Sports Shorts, S",
+          "list": [
+            "Shorts"
+          ]
+        },
+        {
+          "canonicalForm": "Men's Sports Shorts, XL",
+          "list": [
+            "Shorts"
+          ]
+        },
+        {
+          "canonicalForm": "Minipump",
+          "list": [
+            "Pump",
+            "Pumps"
+          ]
+        },
+        {
+          "canonicalForm": "Mountain Bottle Cage",
+          "list": [
+            "Cage",
+            "Cages"
+          ]
+        },
+        {
+          "canonicalForm": "Mountain End Caps",
+          "list": [
+            "Cap",
+            "Caps"
+          ]
+        },
+        {
+          "canonicalForm": "Mountain Pump",
+          "list": [
+            "Pump",
+            "Pumps"
+          ]
+        },
+        {
+          "canonicalForm": "Mountain Rim",
+          "list": [
+            "Rim",
+            "Rims"
+          ]
+        },
+        {
+          "canonicalForm": "Mountain Tire Tube",
+          "list": [
+            "Tube",
+            "Tubes"
+          ]
+        },
+        {
+          "canonicalForm": "Rear Brakes",
+          "list": [
+            "Brakes",
+            "Brake"
+          ]
+        },
+        {
+          "canonicalForm": "Rear Derailleur Cage",
+          "list": [
+            "Cages"
+          ]
+        },
+        {
+          "canonicalForm": "Road Bottle Cage",
+          "list": [
+            "Cage",
+            "Cages"
+          ]
+        },
+        {
+          "canonicalForm": "Road End Caps",
+          "list": [
+            "Cap",
+            "Caps"
+          ]
+        },
+        {
+          "canonicalForm": "Road Tire Tube",
+          "list": [
+            "Tube",
+            "Tubes"
+          ]
+        },
+        {
+          "canonicalForm": "Seat Lug",
+          "list": [
+            "Lug",
+            "Lugs"
+          ]
+        },
+        {
+          "canonicalForm": "Seat Post",
+          "list": [
+            "Posts",
+            "Seat Posts"
+          ]
+        },
+        {
+          "canonicalForm": "Seat Stays",
+          "list": [
+            "Stays"
+          ]
+        },
+        {
+          "canonicalForm": "Seat Tube",
+          "list": [
+            "Tube",
+            "Tubes"
+          ]
+        },
+        {
+          "canonicalForm": "Spokes",
+          "list": []
+        },
+        {
+          "canonicalForm": "Steerer",
+          "list": [
+            "Steerers"
+          ]
+        },
+        {
+          "canonicalForm": "Stem",
+          "list": [
+            "Stems"
+          ]
+        },
+        {
+          "canonicalForm": "Taillights - Battery-Powered",
+          "list": [
+            "Light",
+            "Lights"
+          ]
+        },
+        {
+          "canonicalForm": "Tension Pulley",
+          "list": [
+            "Pulleys"
+          ]
+        },
+        {
+          "canonicalForm": "Top Tube",
+          "list": [
+            "Tube",
+            "Tubes"
+          ]
+        },
+        {
+          "canonicalForm": "Touring End Caps",
+          "list": [
+            "Cap",
+            "Caps"
+          ]
+        },
+        {
+          "canonicalForm": "Touring Pedal",
+          "list": [
+            "Pedals",
+            "Pedal"
+          ]
+        },
+        {
+          "canonicalForm": "Touring Rim",
+          "list": [
+            "Rim",
+            "Rims"
+          ]
+        },
+        {
+          "canonicalForm": "Touring Tire",
+          "list": [
+            "Tire",
+            "Tires"
+          ]
+        },
+        {
+          "canonicalForm": "Touring Tire Tube",
+          "list": [
+            "Tube",
+            "Tubes"
+          ]
+        },
+        {
+          "canonicalForm": "Touring-Panniers, Large",
+          "list": [
+            "Panniers"
+          ]
+        },
+        {
+          "canonicalForm": "Water Bottle - 30 oz.",
+          "list": [
+            "Water Bottle",
+            "Water Bottles"
+          ]
+        },
+        {
+          "canonicalForm": "Women's Mountain Shorts, L",
+          "list": [
+            "Shorts"
+          ]
+        },
+        {
+          "canonicalForm": "Women's Mountain Shorts, M",
+          "list": [
+            "Shorts"
+          ]
+        },
+        {
+          "canonicalForm": "Women's Mountain Shorts, S",
+          "list": [
+            "Shorts"
+          ]
+        },
+        {
+          "canonicalForm": "Women's Tights, L",
+          "list": [
+            "Tights"
+          ]
+        },
+        {
+          "canonicalForm": "Women's Tights, M",
+          "list": [
+            "Tights"
+          ]
+        },
+        {
+          "canonicalForm": "Women's Tights, S",
+          "list": [
+            "Tights"
+          ]
+        }
+      ],
+      "roles": []
+    },
+    {
+      "name": "regions",
+      "subLists": [
+        {
+          "canonicalForm": "10",
+          "list": [
+            "UK,",
+            "United Kingdom,",
+            "England",
+            "uk"
+          ]
+        },
+        {
+          "canonicalForm": "9",
+          "list": [
+            "Austraila"
+          ]
+        },
+        {
+          "canonicalForm": "8",
+          "list": [
+            "Germany"
+          ]
+        },
+        {
+          "canonicalForm": "7",
+          "list": [
+            "France"
+          ]
+        },
+        {
+          "canonicalForm": "6",
+          "list": [
+            "Canada"
+          ]
+        },
+        {
+          "canonicalForm": "5",
+          "list": [
+            "Southeast"
+          ]
+        },
+        {
+          "canonicalForm": "4",
+          "list": [
+            "Southwest"
+          ]
+        },
+        {
+          "canonicalForm": "3",
+          "list": [
+            "Central"
+          ]
+        },
+        {
+          "canonicalForm": "2",
+          "list": [
+            "Northeast"
+          ]
+        },
+        {
+          "canonicalForm": "1",
+          "list": [
+            "Northwest"
+          ]
+        }
+      ],
+      "roles": []
+    }
+  ],
+  "patternAnyEntities": [],
+  "regex_entities": [],
+  "prebuiltEntities": [
+    {
+      "name": "datetimeV2",
+      "roles": []
+    },
+    {
+      "name": "money",
+      "roles": []
+    },
+    {
+      "name": "number",
+      "roles": []
+    },
+    {
+      "name": "ordinal",
+      "roles": []
+    }
+  ],
+  "model_features": [],
+  "regex_features": [],
+  "patterns": [],
+  "utterances": [
+    {
+      "text": "/start",
+      "intent": "Greeting",
+      "entities": []
+    },
+    {
+      "text": "{ \"type\": \"monthchange\", \"month\": 1 }",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "{ \"type\": \"monthchange\", \"month\": 2 }",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "{ \"type\": \"monthchange\", \"month\": 3 }",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "{ \"type\": \"monthchange\", \"month\": 6 }",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "{ \"type\": \"monthchange\", \"month\": 7 }",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "101",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "151",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "155",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "157",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "185",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "188",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "a",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "abort",
+      "intent": "Cancel",
+      "entities": []
+    },
+    {
+      "text": "april",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "bye",
+      "intent": "Cancel",
+      "entities": []
+    },
+    {
+      "text": "can you show me which customers purchased touring tire in march?",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "cancel",
+      "intent": "Cancel",
+      "entities": []
+    },
+    {
+      "text": "channel context",
+      "intent": "Context",
+      "entities": []
+    },
+    {
+      "text": "context",
+      "intent": "Context",
+      "entities": []
+    },
+    {
+      "text": "display regions",
+      "intent": "Regions",
+      "entities": []
+    },
+    {
+      "text": "display territories",
+      "intent": "Regions",
+      "entities": []
+    },
+    {
+      "text": "disregard",
+      "intent": "Cancel",
+      "entities": []
+    },
+    {
+      "text": "do not do it",
+      "intent": "Cancel",
+      "entities": []
+    },
+    {
+      "text": "do not do that",
+      "intent": "Cancel",
+      "entities": []
+    },
+    {
+      "text": "don't",
+      "intent": "Cancel",
+      "entities": []
+    },
+    {
+      "text": "don't do it",
+      "intent": "Cancel",
+      "entities": []
+    },
+    {
+      "text": "don't do that",
+      "intent": "Cancel",
+      "entities": []
+    },
+    {
+      "text": "download sales",
+      "intent": "SalesReport",
+      "entities": []
+    },
+    {
+      "text": "download sales report",
+      "intent": "SalesReport",
+      "entities": []
+    },
+    {
+      "text": "employee details for 7",
+      "intent": "EmployeeDetails",
+      "entities": []
+    },
+    {
+      "text": "example",
+      "intent": "Examples",
+      "entities": []
+    },
+    {
+      "text": "examples",
+      "intent": "Examples",
+      "entities": []
+    },
+    {
+      "text": "february",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "find employee 55",
+      "intent": "EmployeeDetails",
+      "entities": []
+    },
+    {
+      "text": "get details for employee 101",
+      "intent": "EmployeeDetails",
+      "entities": []
+    },
+    {
+      "text": "get details for employee 55",
+      "intent": "EmployeeDetails",
+      "entities": []
+    },
+    {
+      "text": "get details for employee id 101",
+      "intent": "EmployeeDetails",
+      "entities": []
+    },
+    {
+      "text": "get details for employee id 55",
+      "intent": "EmployeeDetails",
+      "entities": []
+    },
+    {
+      "text": "get employee details for 9",
+      "intent": "EmployeeDetails",
+      "entities": []
+    },
+    {
+      "text": "get parts",
+      "intent": "Products",
+      "entities": []
+    },
+    {
+      "text": "get products",
+      "intent": "Products",
+      "entities": []
+    },
+    {
+      "text": "get sales report",
+      "intent": "SalesReport",
+      "entities": []
+    },
+    {
+      "text": "get the top 10 customers that buy helmets",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "get top sales for touring tire for april",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "give me an example",
+      "intent": "Examples",
+      "entities": []
+    },
+    {
+      "text": "give me samples",
+      "intent": "Examples",
+      "entities": []
+    },
+    {
+      "text": "good afternoon",
+      "intent": "Greeting",
+      "entities": []
+    },
+    {
+      "text": "good evening",
+      "intent": "Greeting",
+      "entities": []
+    },
+    {
+      "text": "good morning",
+      "intent": "Greeting",
+      "entities": []
+    },
+    {
+      "text": "good night",
+      "intent": "Greeting",
+      "entities": []
+    },
+    {
+      "text": "goodbye",
+      "intent": "Cancel",
+      "entities": []
+    },
+    {
+      "text": "hello",
+      "intent": "Greeting",
+      "entities": []
+    },
+    {
+      "text": "hello bot",
+      "intent": "Greeting",
+      "entities": []
+    },
+    {
+      "text": "hello!",
+      "intent": "Greeting",
+      "entities": []
+    },
+    {
+      "text": "help",
+      "intent": "Help",
+      "entities": []
+    },
+    {
+      "text": "help me",
+      "intent": "Help",
+      "entities": []
+    },
+    {
+      "text": "help me please",
+      "intent": "Help",
+      "entities": []
+    },
+    {
+      "text": "help please",
+      "intent": "Help",
+      "entities": []
+    },
+    {
+      "text": "hi",
+      "intent": "Greeting",
+      "entities": []
+    },
+    {
+      "text": "hi bot",
+      "intent": "Greeting",
+      "entities": []
+    },
+    {
+      "text": "hi!",
+      "intent": "Greeting",
+      "entities": []
+    },
+    {
+      "text": "hiya",
+      "intent": "Greeting",
+      "entities": []
+    },
+    {
+      "text": "how are you",
+      "intent": "Greeting",
+      "entities": []
+    },
+    {
+      "text": "how are you doing today?",
+      "intent": "Greeting",
+      "entities": []
+    },
+    {
+      "text": "how are you doing?",
+      "intent": "Greeting",
+      "entities": []
+    },
+    {
+      "text": "how are you today?",
+      "intent": "Greeting",
+      "entities": []
+    },
+    {
+      "text": "howdy",
+      "intent": "Greeting",
+      "entities": []
+    },
+    {
+      "text": "howdy!",
+      "intent": "Greeting",
+      "entities": []
+    },
+    {
+      "text": "i am stuck",
+      "intent": "Help",
+      "entities": []
+    },
+    {
+      "text": "i want to see a list of who buys touring tires",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "i want to see the top 10 customers that buy touring tires",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "i would like to cancel",
+      "intent": "Cancel",
+      "entities": []
+    },
+    {
+      "text": "i'm stuck",
+      "intent": "Help",
+      "entities": []
+    },
+    {
+      "text": "list employees in france",
+      "intent": "EmployeeList",
+      "entities": []
+    },
+    {
+      "text": "list employees in uk",
+      "intent": "EmployeeList",
+      "entities": []
+    },
+    {
+      "text": "list parts",
+      "intent": "Products",
+      "entities": []
+    },
+    {
+      "text": "list products",
+      "intent": "Products",
+      "entities": []
+    },
+    {
+      "text": "list regions",
+      "intent": "Regions",
+      "entities": []
+    },
+    {
+      "text": "list territories",
+      "intent": "Regions",
+      "entities": []
+    },
+    {
+      "text": "ll mountain tire",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "ll road tire",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "march",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "mary",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "my water bottle is green.",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "never mind",
+      "intent": "Cancel",
+      "entities": []
+    },
+    {
+      "text": "next month",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "oidsfgsf",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "parts",
+      "intent": "Products",
+      "entities": []
+    },
+    {
+      "text": "please cancel",
+      "intent": "Cancel",
+      "entities": []
+    },
+    {
+      "text": "please disregard",
+      "intent": "Cancel",
+      "entities": []
+    },
+    {
+      "text": "please help me",
+      "intent": "Help",
+      "entities": []
+    },
+    {
+      "text": "please stop",
+      "intent": "Cancel",
+      "entities": []
+    },
+    {
+      "text": "product list",
+      "intent": "Products",
+      "entities": []
+    },
+    {
+      "text": "products",
+      "intent": "Products",
+      "entities": []
+    },
+    {
+      "text": "regions",
+      "intent": "Regions",
+      "entities": []
+    },
+    {
+      "text": "sales report",
+      "intent": "SalesReport",
+      "entities": []
+    },
+    {
+      "text": "sample",
+      "intent": "Examples",
+      "entities": []
+    },
+    {
+      "text": "sample queries",
+      "intent": "Examples",
+      "entities": []
+    },
+    {
+      "text": "samples",
+      "intent": "Examples",
+      "entities": []
+    },
+    {
+      "text": "shoe me the top 5 customers that bought tires",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show context",
+      "intent": "Context",
+      "entities": []
+    },
+    {
+      "text": "show details",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "show details for employee 183",
+      "intent": "EmployeeDetails",
+      "entities": []
+    },
+    {
+      "text": "show details for employee 55",
+      "intent": "EmployeeDetails",
+      "entities": []
+    },
+    {
+      "text": "show details for employee id 101",
+      "intent": "EmployeeDetails",
+      "entities": []
+    },
+    {
+      "text": "show details for employee id 55",
+      "intent": "EmployeeDetails",
+      "entities": []
+    },
+    {
+      "text": "show employee",
+      "intent": "EmployeeDetails",
+      "entities": []
+    },
+    {
+      "text": "show employee 55",
+      "intent": "EmployeeDetails",
+      "entities": []
+    },
+    {
+      "text": "show employees",
+      "intent": "EmployeeList",
+      "entities": []
+    },
+    {
+      "text": "show employees from germany",
+      "intent": "EmployeeList",
+      "entities": []
+    },
+    {
+      "text": "show employees from uk",
+      "intent": "EmployeeList",
+      "entities": []
+    },
+    {
+      "text": "show employees in australia",
+      "intent": "EmployeeList",
+      "entities": []
+    },
+    {
+      "text": "show employees in central",
+      "intent": "EmployeeList",
+      "entities": []
+    },
+    {
+      "text": "show employees in france",
+      "intent": "EmployeeList",
+      "entities": []
+    },
+    {
+      "text": "show employees in germany",
+      "intent": "EmployeeList",
+      "entities": []
+    },
+    {
+      "text": "show employees in northeast",
+      "intent": "EmployeeList",
+      "entities": []
+    },
+    {
+      "text": "show employees in northwest",
+      "intent": "EmployeeList",
+      "entities": []
+    },
+    {
+      "text": "show employees in southeast",
+      "intent": "EmployeeList",
+      "entities": []
+    },
+    {
+      "text": "show employees in uk",
+      "intent": "EmployeeList",
+      "entities": []
+    },
+    {
+      "text": "show empoyees",
+      "intent": "EmployeeList",
+      "entities": []
+    },
+    {
+      "text": "show examples",
+      "intent": "Examples",
+      "entities": []
+    },
+    {
+      "text": "show me sales of tires for july",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show me sales of tires for may",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show me the money",
+      "intent": "SalesReport",
+      "entities": []
+    },
+    {
+      "text": "show me the sales data for tires in may",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show me the top 10 customer that purchased touring tire in august",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show me the top 10 customers that bought touring tire from 1/1/2018 to 4/16/2018",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show me the top 10 customers that buy tubes",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show me the top 10 customers that purchased touring tire in august",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show me the top 10 customers who bought touring tires in march",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show me the top 15 customer that purchased tires in march",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show me the top 15 customer that purchased touring tire in august",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show me the top 15 customer that purchased touring tire in march",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show me the top 15 customer that purchased touring tires in august",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show me the top 15 customer that purchased touring tires in march",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show me the top 15 customers that purchased touring tire in march",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show me the top 15 customers that purchased touring tires in august",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show me the top 15 customers that purchased touring tires in march",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show me the top 20 customers that bought touring tires in december",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show me the top 5 customers that bought tire",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show me the top 5 customers that bought tires",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show me the top 5 customers that bought tires in march",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show me the top 5 customers that bought tires in may",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show me the top 5 customers that bought touring tire",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show me the top 5 customers that bought touring tire in april",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show me the top 5 customers that bought touring tire in march",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show me the top 7 who bought touring tire in may",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show me the top 8 customers that bought tires",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show me the top 8 customers that purchased tires",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show me the top 8 who bought touring tire from 1/1/2018 to 1/31/2018",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show me tire sales for june",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show me top 10 sales for touring tire",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show me top 15 customers that purchased touring tire in march",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show me top sales for bibs",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show me top sales for mountain tire",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show me top sales for tire",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show me top sales for tires in february",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show me top sales for touring tire in april",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show me top sales for touring tire in march",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show me who bought tire from 1/1/2018 to 4/16/2018",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show me who bought touring tire from 1/1/2018 to 4/16/2018",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show me who bought touring tire from 1/1/2018 to 4/4/2018",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show me who bought touring tire in march",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show me who buys the most gloves",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show parts",
+      "intent": "Products",
+      "entities": []
+    },
+    {
+      "text": "show products",
+      "intent": "Products",
+      "entities": []
+    },
+    {
+      "text": "show queries",
+      "intent": "Examples",
+      "entities": []
+    },
+    {
+      "text": "show regions",
+      "intent": "Regions",
+      "entities": []
+    },
+    {
+      "text": "show sales",
+      "intent": "SalesReport",
+      "entities": []
+    },
+    {
+      "text": "show sales people in uk",
+      "intent": "EmployeeList",
+      "entities": []
+    },
+    {
+      "text": "show sales report",
+      "intent": "SalesReport",
+      "entities": []
+    },
+    {
+      "text": "show sample queries",
+      "intent": "Examples",
+      "entities": []
+    },
+    {
+      "text": "show samples",
+      "intent": "Examples",
+      "entities": []
+    },
+    {
+      "text": "show territories",
+      "intent": "Regions",
+      "entities": []
+    },
+    {
+      "text": "show tire sales for june",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show tire sales for may",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show top 3 sales for shorts",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show top 3 sales for tires in april",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show top 3 sales for water bottles",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show top sales for gloves for august",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show top sales for mountain tire in february",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show top sales for tire",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show top sales for tires",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show top sales for tires in april",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show top sales for tires in june",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show top sales for tires in march",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show top sales for touring tire in april",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show top sales for touring tire in february",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show top sales for touring tire in may",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "show top sales for vests for march",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "stop",
+      "intent": "Cancel",
+      "entities": []
+    },
+    {
+      "text": "territories",
+      "intent": "Regions",
+      "entities": []
+    },
+    {
+      "text": "thanks",
+      "intent": "Cancel",
+      "entities": []
+    },
+    {
+      "text": "thanks!",
+      "intent": "Cancel",
+      "entities": []
+    },
+    {
+      "text": "there is a large deep dish pizza in your future.",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "top customers that purchased touring tire in january",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "top tire sales",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "what can i say",
+      "intent": "Help",
+      "entities": []
+    },
+    {
+      "text": "what can you do",
+      "intent": "Help",
+      "entities": []
+    },
+    {
+      "text": "what can you help me with",
+      "intent": "Help",
+      "entities": []
+    },
+    {
+      "text": "what do i do now?",
+      "intent": "Help",
+      "entities": []
+    },
+    {
+      "text": "what do i do?",
+      "intent": "Help",
+      "entities": []
+    },
+    {
+      "text": "which customers bought the most touring tires in january?",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "which customers bought the most touring tires last month?",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "which customers buy the most tires",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "which customers buy the most tires?",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "which customers buy the most touring tires?",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "which customers have purchased touring tire?",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "which customers have purchased touring tires?",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "who bought the most gear in march",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "who bought the most gloves in july?",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "who bought the most tires in march?",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "who bought the most touring tire in march",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "who bought the most touring tires in february?",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "who bought tires in march?",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "who buys the most vests?",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "who employees in austrailia",
+      "intent": "EmployeeList",
+      "entities": []
+    },
+    {
+      "text": "who samples",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "who sold the most touring tires from january 1 to march 1?",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "who sold the most touring tires since january 1?",
+      "intent": "TopCustomersForProduct",
+      "entities": []
+    },
+    {
+      "text": "why doesn't this work ?",
+      "intent": "Help",
+      "entities": []
+    }
+  ]
+}
