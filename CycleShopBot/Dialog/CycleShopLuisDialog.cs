@@ -1,11 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Threading.Tasks;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Luis;
 using Microsoft.Bot.Builder.Luis.Models;
 using Microsoft.Bot.Connector;
+using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Threading.Tasks;
 
 namespace CycleShopBot
 {
