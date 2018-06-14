@@ -47,3 +47,14 @@ Having trouble?  Log an issue here and I'll try to help.
 To learn how to debug Azure Bot Service bots, please visit [https://aka.ms/bf-docs-azure-debug](https://aka.ms/bf-docs-azure-debug).
 
 To debug locally, you'll need to [configure your dev environment](https://docs.microsoft.com/en-us/azure/azure-functions/functions-develop-vs) and [run/debug the Azure function(s) locally](https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local).  Then you can use the locally running bot by [connecting the Bot Framework Emulator to the locally running bot Function](https://docs.microsoft.com/en-us/azure/bot-service/bot-service-debug-emulator?view=azure-bot-service-3.0).
+
+# About
+
+## Contributors
+
+- [Nate Rickard](https://github.com/NateRickard)
+- [Steve Hall](https://github.com/srhallx)
+
+## License
+
+Licensed under the MIT License (MIT). See [LICENSE](/LICENSE) for details.
