@@ -121,7 +121,7 @@ namespace CycleShopBot
 			{
 				if (!BotContext.MockDataEnabled)
 				{
-					var functionUri = context.GetFunctionUrl ("SalesPeopleInRegion",
+					var functionUri = Utils.GetFunctionUrl ("SalesPeopleInRegion",
 						(nameof (regionCode), regionCode),
 						(nameof (region), region));
 

@@ -1,4 +1,5 @@
 ﻿using CycleShopBot.Cards;
+using CycleShopBot.Framework;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Luis;
 using Microsoft.Bot.Builder.Luis.Models;
@@ -25,15 +26,6 @@ namespace CycleShopBot
 
 		static readonly HttpClient Client = new HttpClient ();
 
-		static readonly Dictionary<string, CardSupport?> ChannelCardSupport = new Dictionary<string, CardSupport?> ()
-		{
-			{ "emulator", CardSupport.Adaptive },
-			{ "webchat", CardSupport.Adaptive },
-			{ "msteams", CardSupport.Adaptive },
-			{ "directline", CardSupport.Adaptive },
-			{ "skype", CardSupport.Adaptive }
-		};
-
 		// settings to properly handle our scientific notation formatted decimal values
 		static readonly JsonSerializerSettings SerializerSettings = new JsonSerializerSettings
 		{
@@ -45,11 +37,22 @@ namespace CycleShopBot
 		readonly BotCommand<int> PrevMonth;
 		readonly BotCommand<int> NextMonth;
 
+		enum Cards
+		{
+			SalesCard
+		}
+
 		public CustomerSalesDataDialog (LuisResult luisResult)
 		{
 			MonthChange = DefineAction ("MonthChange", "Month");
 			PrevMonth = MonthChange.DefineCommand ("Prev Month", () => selectedMonth == 1 ? 12 : selectedMonth - 1);
 			NextMonth = MonthChange.DefineCommand ("Next Month", () => selectedMonth == 12 ? 1 : selectedMonth + 1);
+
+			Channel.Emulator.RegisterCardSupport (Cards.SalesCard, CardSupport.Adaptive);
+			Channel.WebChat.RegisterCardSupport (Cards.SalesCard, CardSupport.Adaptive);
+			Channel.Teams.RegisterCardSupport (Cards.SalesCard, CardSupport.Adaptive);
+			Channel.Skype.RegisterCardSupport (Cards.SalesCard, CardSupport.Adaptive);
+			Channel.DirectLine.RegisterCardSupport (Cards.SalesCard, CardSupport.Adaptive);
 
 			productSelection = FindProducts (luisResult);
 			dateRange = GetDateRanges (luisResult);
@@ -61,7 +64,7 @@ namespace CycleShopBot
 			// try to find an exact product match
 			if (productSelection.SelectedProduct != null)
 			{
-				await context.PostAsync ($"Sure, I can help you with sales data for {productSelection.SelectedProduct.ToTitleCase()}");
+				await context.PostAsync ($"Sure, I can help you with sales data for {productSelection.SelectedProduct.ToTitleCase ()}");
 
 				await ProductSelected (context, new AwaitableFromItem<string> (productSelection.SelectedProduct));
 			}
@@ -218,9 +221,9 @@ namespace CycleShopBot
 
 			var attachments = new List<Attachment> ();
 
-			ChannelCardSupport.TryGetValue (context.Activity.ChannelId, out CardSupport? channelCardSupport);
+			var channelCardSupport = BotContext.CurrentChannel.GetCardSupport (Cards.SalesCard);
 
-			switch (channelCardSupport ?? CardSupport.Thumbnail)
+			switch (channelCardSupport)
 			{
 				case CardSupport.Adaptive:
 
@@ -229,6 +232,7 @@ namespace CycleShopBot
 
 					break;
 				case CardSupport.Thumbnail:
+				case CardSupport.Unknown:
 
 					var cardList = new ThumbnailSalesCardList (productSelection.SelectedProduct, numberCustomers, selectedMonth, data, PrevMonth, NextMonth);
 					attachments.AddRange (cardList.AsAttachmentList ());
@@ -257,7 +261,7 @@ namespace CycleShopBot
 			{
 				if (!BotContext.MockDataEnabled)
 				{
-					var functionUri = context.GetFunctionUrl ("TopCustomersForProduct",
+					var functionUri = Utils.GetFunctionUrl ("TopCustomersForProduct",
 						(nameof (product), product),
 						(nameof (month), month),
 						(nameof (count), count));
@@ -274,7 +278,7 @@ namespace CycleShopBot
 				}
 				else
 				{
-					return MockData.CustomerSales.Take (count).ToList ();
+					return MockData.CustomerSales.OrderBy (cs => cs.TotalSales).Take (count).ToList ();
 				}
 			}
 			catch
@@ -284,12 +288,6 @@ namespace CycleShopBot
 
 				throw Exceptions.DataException;
 			}
-		}
-
-		enum CardSupport
-		{
-			Thumbnail,
-			Adaptive
 		}
 	}
 }

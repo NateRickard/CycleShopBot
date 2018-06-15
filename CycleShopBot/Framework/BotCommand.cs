@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CycleShopBot
+namespace CycleShopBot.Framework
 {
 	[Serializable]
 	public class BotCommand

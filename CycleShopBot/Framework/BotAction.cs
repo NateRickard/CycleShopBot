@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace CycleShopBot
+namespace CycleShopBot.Framework
 {
 	[Serializable]
 	public class BotAction

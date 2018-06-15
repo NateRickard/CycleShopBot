@@ -16,25 +16,16 @@ namespace CycleShopBot
 {
 	public static class CycleShopBot
 	{
-		internal static string BaseFunctionUrl;
-
 		[FunctionName ("CycleShopBot")]
 		public static async Task<HttpResponseMessage> Run ([HttpTrigger (AuthorizationLevel.Function, "get", "post", Route = null)]HttpRequestMessage req, TraceWriter log)
 		{
 			log.Info ("C# HTTP trigger function processed a request.");
-
-			if (BaseFunctionUrl == null)
-			{
-				//BaseFunctionUrl = $"{req.Protocol}://{req.Host}";
-				BaseFunctionUrl = req.RequestUri.AbsoluteUri.Replace (req.RequestUri.PathAndQuery, "");
-			}
 
 			// Initialize the azure bot
 			using (BotService.Initialize ())
 			{
 				// Deserialize the incoming activity
 				string jsonContent = await req.Content.ReadAsStringAsync ();
-				//string jsonContent = await req.ReadAsStringAsync();
 				var activity = JsonConvert.DeserializeObject<Activity> (jsonContent);
 
 				// authenticate incoming request and add activity.ServiceUrl to MicrosoftAppCredentials.TrustedHostNames
@@ -46,6 +37,8 @@ namespace CycleShopBot
 
 				if (activity != null)
 				{
+					BotContext.Initialize (req, activity);
+
 					// one of these will have an interface and process it
 					switch (activity.GetActivityType ())
 					{

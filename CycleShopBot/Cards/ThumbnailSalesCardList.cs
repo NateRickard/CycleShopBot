@@ -1,4 +1,5 @@
-﻿using Microsoft.Bot.Connector;
+﻿using CycleShopBot.Framework;
+using Microsoft.Bot.Connector;
 using System.Collections.Generic;
 using System.Linq;
 

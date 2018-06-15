@@ -118,7 +118,6 @@ namespace CycleShopBot
 
 			await context.PostAsync (replyMessage);
 			context.Wait (MessageReceived);
-
 		}
 
 		[LuisIntent ("Regions")]
@@ -127,6 +126,7 @@ namespace CycleShopBot
 			var replyMessage = context.MakeMessage ();
 			replyMessage.TextFormat = "markdown";
 			replyMessage.Text = $"Cycle Shop Regions\n\n-Northwest\n-Northeast\n-Central\n-Southwest\n-Southeast\n-Canada\n-France\n-Germany\n-UK";
+
 			await context.PostAsync (replyMessage);
 			context.Wait (MessageReceived);
 		}
@@ -144,6 +144,7 @@ namespace CycleShopBot
 		{
 			var replyMessage = context.MakeMessage ();
 			replyMessage.Text = $"ChannelID: {context.Activity.ChannelId}";
+
 			await context.PostAsync (replyMessage);
 			context.Wait (MessageReceived);
 		}

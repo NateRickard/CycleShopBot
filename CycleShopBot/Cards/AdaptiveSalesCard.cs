@@ -1,4 +1,5 @@
 ﻿using AdaptiveCards;
+using CycleShopBot.Framework;
 using Microsoft.Bot.Connector;
 using System;
 using System.Collections.Generic;

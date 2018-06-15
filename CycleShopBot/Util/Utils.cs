@@ -35,20 +35,18 @@ namespace CycleShopBot
 			await context.PostAsync (typingIndicator);
 		}
 
-		public static string GetFunctionUrl (this IDialogContext context, string functionName, params (string Name, object Value) [] args)
+		public static string GetFunctionUrl (string functionName, params (string Name, object Value) [] args)
 		{
 			string functionSecret = ConfigurationManager.AppSettings [$"{functionName}APIKey"];
 
 			//context.PostAsync ("baseUrl url is:" + BaseFunctionUrl);
 
-			var localFunctionsEnabled = Convert.ToBoolean (ConfigurationManager.AppSettings ["LocalDataFunctions"] ?? "false");
-
-			if (!localFunctionsEnabled && CycleShopBot.BaseFunctionUrl.Contains ("localhost")) //can't hit SAP locally so we need to hit the prod functions here
+			if (!BotContext.LocalFunctionsEnabled && BotContext.BaseFunctionUrl.Contains ("localhost")) //can't hit SAP locally so we need to hit the prod functions here
 			{
-				CycleShopBot.BaseFunctionUrl = ConfigurationManager.AppSettings ["DefaultFunctionUrl"];
+				BotContext.BaseFunctionUrl = BotContext.DefaultFunctionUrl;
 			}
 
-			var functionUrl = $"{CycleShopBot.BaseFunctionUrl}/api/{functionName}?code={functionSecret}";
+			var functionUrl = $"{BotContext.BaseFunctionUrl}/api/{functionName}?code={functionSecret}";
 
 			if (args != null)
 			{

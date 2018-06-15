@@ -80,8 +80,8 @@ namespace CycleShopBot
 			{
 				if (!BotContext.MockDataEnabled)
 				{
-					var functionUri = context.GetFunctionUrl ("EmployeeDetails",
-					(nameof (employeeid), employeeid));
+					var functionUri = Utils.GetFunctionUrl ("EmployeeDetails",
+						(nameof (employeeid), employeeid));
 
 					var response = await Client.PostAsync (functionUri, null);
 
