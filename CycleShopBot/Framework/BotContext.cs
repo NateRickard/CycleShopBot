@@ -1,4 +1,5 @@
 ﻿using CycleShopBot.Framework;
+using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Connector;
 using System;
 using System.Configuration;
@@ -16,16 +17,17 @@ namespace CycleShopBot
 
 		public static string BaseFunctionUrl { get; set; }
 
-		public static Channel CurrentChannel { get; private set; }
-
-		public static void Initialize (HttpRequestMessage req, Activity activity)
+		public static void Initialize (HttpRequestMessage req)
 		{
 			if (BaseFunctionUrl == null)
 			{
 				BaseFunctionUrl = req.RequestUri.AbsoluteUri.Replace (req.RequestUri.PathAndQuery, string.Empty);
 			}
+		}
 
-			CurrentChannel = Channel.FromId (activity.ChannelId);
+		public static Channel GetCurrentChannel (IDialogContext context)
+		{
+			return Channel.FromId (context.Activity.ChannelId);
 		}
 	}
 }

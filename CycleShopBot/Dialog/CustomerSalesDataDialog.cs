@@ -221,7 +221,7 @@ namespace CycleShopBot
 
 			var attachments = new List<Attachment> ();
 
-			var channelCardSupport = BotContext.CurrentChannel.GetCardSupport (Cards.SalesCard);
+			var channelCardSupport = BotContext.GetCurrentChannel (context).GetCardSupport (Cards.SalesCard);
 
 			switch (channelCardSupport)
 			{

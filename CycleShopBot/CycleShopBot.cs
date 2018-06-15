@@ -37,7 +37,7 @@ namespace CycleShopBot
 
 				if (activity != null)
 				{
-					BotContext.Initialize (req, activity);
+					BotContext.Initialize (req);
 
 					// one of these will have an interface and process it
 					switch (activity.GetActivityType ())
