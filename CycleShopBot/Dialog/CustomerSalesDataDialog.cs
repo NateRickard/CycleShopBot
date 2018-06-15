@@ -48,6 +48,7 @@ namespace CycleShopBot
 			PrevMonth = MonthChange.DefineCommand ("Prev Month", () => selectedMonth == 1 ? 12 : selectedMonth - 1);
 			NextMonth = MonthChange.DefineCommand ("Next Month", () => selectedMonth == 12 ? 1 : selectedMonth + 1);
 
+			// define which channels will receive the adaptive sales card... default is thumbnail card
 			Channel.Emulator.RegisterCardSupport (Cards.SalesCard, CardSupport.Adaptive);
 			Channel.WebChat.RegisterCardSupport (Cards.SalesCard, CardSupport.Adaptive);
 			Channel.Teams.RegisterCardSupport (Cards.SalesCard, CardSupport.Adaptive);
