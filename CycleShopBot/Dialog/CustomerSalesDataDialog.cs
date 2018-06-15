@@ -44,6 +44,7 @@ namespace CycleShopBot
 
 		public CustomerSalesDataDialog (LuisResult luisResult)
 		{
+			// define an Action (change month) and 2 commands that trigger it - prev month and next month
 			MonthChange = DefineAction ("MonthChange", "Month");
 			PrevMonth = MonthChange.DefineCommand ("Prev Month", () => selectedMonth == 1 ? 12 : selectedMonth - 1);
 			NextMonth = MonthChange.DefineCommand ("Next Month", () => selectedMonth == 12 ? 1 : selectedMonth + 1);
