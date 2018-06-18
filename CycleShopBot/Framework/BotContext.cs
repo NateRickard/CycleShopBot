@@ -21,7 +21,15 @@ namespace CycleShopBot
 		{
 			if (BaseFunctionUrl == null)
 			{
-				BaseFunctionUrl = req.RequestUri.AbsoluteUri.Replace (req.RequestUri.PathAndQuery, string.Empty);
+				// if we are not hitting other functions locally, we need to default to their production host
+				if (!LocalFunctionsEnabled && req.RequestUri.AbsoluteUri.Contains ("localhost"))
+				{
+					BaseFunctionUrl = DefaultFunctionUrl;
+				}
+				else
+				{
+					BaseFunctionUrl = req.RequestUri.AbsoluteUri.Replace (req.RequestUri.PathAndQuery, string.Empty);
+				}
 			}
 		}
 

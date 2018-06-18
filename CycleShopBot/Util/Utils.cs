@@ -39,13 +39,6 @@ namespace CycleShopBot
 		{
 			string functionSecret = ConfigurationManager.AppSettings [$"{functionName}APIKey"];
 
-			//context.PostAsync ("baseUrl url is:" + BaseFunctionUrl);
-
-			if (!BotContext.LocalFunctionsEnabled && BotContext.BaseFunctionUrl.Contains ("localhost")) //can't hit SAP locally so we need to hit the prod functions here
-			{
-				BotContext.BaseFunctionUrl = BotContext.DefaultFunctionUrl;
-			}
-
 			var functionUrl = $"{BotContext.BaseFunctionUrl}/api/{functionName}?code={functionSecret}";
 
 			if (args != null)
