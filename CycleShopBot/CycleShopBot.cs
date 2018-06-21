@@ -51,7 +51,8 @@ namespace CycleShopBot
 
 							if (update.MembersAdded.Any ())
 							{
-								var newMembers = update.MembersAdded?.Where (t => t.Id != activity.Recipient.Id);
+								// we'll send a welcome msg when the bot joins the conversation
+								var newMembers = update.MembersAdded?.Where (t => t.Id == activity.Recipient.Id);
 
 								if (newMembers.Any ())
 								{
@@ -60,20 +61,6 @@ namespace CycleShopBot
 
 									await client.Conversations.ReplyToActivityAsync (reply);
 								}
-
-								//foreach (var newMember in newMembers)
-								//{
-								//  reply.Text = "Welcome";
-
-								//  if (!string.IsNullOrEmpty (newMember.Name))
-								//  {
-								//      reply.Text += $" {newMember.Name}";
-								//  }
-
-								//  reply.Text += "!";
-
-								//  await client.Conversations.ReplyToActivityAsync (reply);
-								//}
 							}
 							break;
 						case ActivityTypes.ContactRelationUpdate:
